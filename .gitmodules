@@ -1,0 +1,3 @@
+[submodule "andromodem-frontend"]
+	path = andromodem-frontend
+	url = git@github.com:basiooo/andromodem-frontend.git
