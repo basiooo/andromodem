@@ -90,3 +90,20 @@ func DisableMobileData(d *adb.Device) error {
 	}
 	return err
 }
+
+func GetDeviceTemp(d *adb.Device) (string, error) {
+	deviceTemp, err := d.RunCommand(`
+	for VARIABLE in $(seq 0 100)
+	do
+		if [ -e /sys/devices/virtual/thermal/thermal_zone$VARIABLE/type ]; then
+		cat /sys/devices/virtual/thermal/thermal_zone$VARIABLE/type
+		cat /sys/devices/virtual/thermal/thermal_zone$VARIABLE/temp
+		fi
+	done
+	`)
+	if err != nil {
+		log.Printf("GetDeviceTemp(): %v", err)
+		return "", err
+	}
+	return deviceTemp, nil
+}
