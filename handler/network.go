@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	adb "github.com/abccyz/goadb"
 	adbcommands "github.com/basiooo/andromodem/adb_command"
 	"github.com/basiooo/andromodem/helper"
@@ -9,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"time"
 )
 
 func fetchDeviceNetworkInfo(d *adb.Device) model.DeviceNetwork {
@@ -54,6 +56,18 @@ func GetNetwork(writter http.ResponseWriter, request *http.Request) {
 	helper.WriteToResponseBody(writter, deviceNetwork, http.StatusOK)
 }
 
+func deviceHasMobileDataEnable(device *adb.Device) bool {
+	rawConnectionState, _ := adbcommands.GetMobileDataConnectionState(device)
+	connectionState := parser.ParseMobileDataConnectionState(rawConnectionState)
+	hasConnectionEnable := false
+	for _, state := range connectionState {
+		if state == parser.DataConnected || state == parser.DataConnecting {
+			hasConnectionEnable = true
+			break
+		}
+	}
+	return hasConnectionEnable
+}
 func MobileDataToggle(writter http.ResponseWriter, request *http.Request) {
 	adbClient, err := helper.GetADBClient(request)
 	helper.PanicIfError(err)
@@ -67,19 +81,25 @@ func MobileDataToggle(writter http.ResponseWriter, request *http.Request) {
 		helper.WriteToResponseBody(writter, response, http.StatusNotFound)
 		return
 	}
-	rawConnectionState, _ := adbcommands.GetMobileDataConnectionState(device)
-	connectionState := parser.ParseMobileDataConnectionState(rawConnectionState)
-	hasConnectionEnable := false
-	for _, state := range connectionState {
-		if state == parser.DataConnected || state == parser.DataConnecting {
-			hasConnectionEnable = true
-			break
-		}
-	}
+	hasConnectionEnable := deviceHasMobileDataEnable(device)
 	if hasConnectionEnable {
 		err = adbcommands.DisableMobileData(device)
 	} else {
 		err = adbcommands.EnableMobileData(device)
+	}
+	timeout := 30 * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	for {
+		if deviceHasMobileDataEnable(device) != hasConnectionEnable {
+			break
+		}
+		select {
+		case <-ctx.Done():
+			break
+		default:
+		}
+		time.Sleep(1 * time.Second)
 	}
 	response := model.ToggleMobileDataResponse{
 		Success: true,
