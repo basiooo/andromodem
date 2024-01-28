@@ -90,13 +90,14 @@ func MobileDataToggle(writter http.ResponseWriter, request *http.Request) {
 	timeout := 30 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
+outerLoop:
 	for {
 		if deviceHasMobileDataEnable(device) != hasConnectionEnable {
 			break
 		}
 		select {
 		case <-ctx.Done():
-			break
+			break outerLoop
 		default:
 		}
 		time.Sleep(1 * time.Second)
