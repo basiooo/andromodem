@@ -1,14 +1,15 @@
 package handler
 
 import (
-	adb "github.com/abccyz/goadb"
 	adbcommands "github.com/basiooo/andromodem/adb_command"
+	"github.com/basiooo/andromodem/parser"
+	"net/http"
+
+	adb "github.com/abccyz/goadb"
 	"github.com/basiooo/andromodem/helper"
 	"github.com/basiooo/andromodem/model"
-	"github.com/basiooo/andromodem/parser"
 	"github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
-	"net/http"
 )
 
 func fetchDeviceInfo(d *adb.Device) model.DeviceInfo {
