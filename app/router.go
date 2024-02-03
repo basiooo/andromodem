@@ -28,6 +28,7 @@ func NewRouter(templateFS embed.FS, adbClient *adb.Adb) chi.Router {
 	r.Route("/api", func(r chi.Router) {
 		r.Get("/devices", handler.GetDevices)
 		r.Get("/device/{serial}", handler.GetDevice)
+		r.Get("/device/{serial}/thermal", handler.GetThermal)
 		r.Get("/network/{serial}", handler.GetNetwork)
 		r.Post("/network/{serial}/mobile-data/toggle", handler.MobileDataToggle)
 	})
