@@ -91,9 +91,9 @@ func DisableMobileData(d *adb.Device) error {
 	return err
 }
 
-func GetDeviceTemp(d *adb.Device) (string, error) {
-	deviceTemp, err := d.RunCommand(`
-	for VARIABLE in $(seq 0 100)
+func GetDeviceThermal(d *adb.Device) (string, error) {
+	deviceThermal, err := d.RunCommand(`
+	for VARIABLE in $(seq 0 80)
 	do
 		if [ -e /sys/devices/virtual/thermal/thermal_zone$VARIABLE/type ]; then
 		cat /sys/devices/virtual/thermal/thermal_zone$VARIABLE/type
@@ -105,5 +105,5 @@ func GetDeviceTemp(d *adb.Device) (string, error) {
 		log.Printf("GetDeviceTemp(): %v", err)
 		return "", err
 	}
-	return deviceTemp, nil
+	return deviceThermal, nil
 }

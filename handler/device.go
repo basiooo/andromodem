@@ -55,3 +55,26 @@ func GetDevice(writter http.ResponseWriter, request *http.Request) {
 	helper.WriteToResponseBody(writter, deviceInfo, http.StatusOK)
 
 }
+
+func GetThermal(writter http.ResponseWriter, request *http.Request) {
+	adbClient, err := helper.GetADBClient(request)
+	helper.PanicIfError(err)
+	serial := chi.URLParam(request, "serial")
+	device, err := helper.GetDeviceBySerial(adbClient, serial)
+	if err != nil {
+		logrus.WithField("function", "GetDeviceThermal").Errorf("failed get device %v. error: %v", serial, err)
+		response := model.WebResponseError{
+			Error: "Device Not Found",
+		}
+		helper.WriteToResponseBody(writter, response, http.StatusNotFound)
+		return
+	}
+	rawThermal, err := adbcommands.GetDeviceThermal(device)
+	if err != nil {
+		logrus.WithField("function", "GetDeviceThermal").Errorf("failed get thermal %v. error: %v", serial, err)
+	}
+	thermal := parser.ParseThermal(rawThermal)
+	deviceThermal := thermal.Data
+	helper.WriteToResponseBody(writter, deviceThermal, http.StatusOK)
+
+}
