@@ -1,6 +1,9 @@
 package service
 
 import (
+	"fmt"
+	"sync"
+
 	goadb "github.com/abccyz/goadb"
 	"github.com/basiooo/andromodem/internal/adb"
 	"github.com/basiooo/andromodem/internal/model"
@@ -24,10 +27,11 @@ func NewMessageService(adb *adb.Adb, adbCommand adbcommand.AdbCommand) MessageSe
 		AdbCommand: adbCommand,
 	}
 }
-func (d *MessageServiceImpl) GetSmsInbox(device goadb.Device) *[]parser.SMSInbox {
+func (d *MessageServiceImpl) GetSmsInbox(device goadb.Device) (*[]parser.SMSInbox, error) {
 	rawSmsInbox, _ := d.AdbCommand.GetSmsInbox(device)
-	smsInboxs := parser.NewSMSInbox(rawSmsInbox)
-	return smsInboxs
+
+	smsInboxs, err := parser.NewSMSInbox(rawSmsInbox)
+	return smsInboxs, err
 }
 
 func (d *MessageServiceImpl) GetInbox(serial string) (*model.MessageSMSInbox, error) {
@@ -35,13 +39,18 @@ func (d *MessageServiceImpl) GetInbox(serial string) (*model.MessageSMSInbox, er
 	if err != nil {
 		return nil, util.ErrDeviceNotFound
 	}
-	smsInbox := &model.MessageSMSInbox{}
-	smsInboxChan := make(chan *[]parser.SMSInbox)
-	go func() {
-		defer close(smsInboxChan)
-		smsInboxChan <- d.GetSmsInbox(*device)
-	}()
-	smsInbox.Inboxs = <-smsInboxChan
 
+	smsInbox := &model.MessageSMSInbox{}
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		smsInbox.Inboxs, err = d.GetSmsInbox(*device)
+		fmt.Println(err)
+	}()
+	wg.Wait()
+	if err != nil {
+		return nil, err
+	}
 	return smsInbox, nil
 }

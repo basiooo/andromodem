@@ -1,6 +1,8 @@
 package service
 
 import (
+	"sync"
+
 	goadb "github.com/abccyz/goadb"
 	"github.com/basiooo/andromodem/internal/adb"
 	"github.com/basiooo/andromodem/internal/model"
@@ -75,24 +77,21 @@ func (d *DeviceServiceImpl) GetDeviceInfo(serial string) (*model.DeviceInfo, err
 	if err != nil {
 		return nil, util.ErrDeviceNotFound
 	}
-	deviceInfo := &model.DeviceInfo{}
-	rootChan := make(chan parser.Root)
-	batteryChan := make(chan parser.Battery)
-	devicePropChan := make(chan parser.DeviceProp)
+	var deviceInfo model.DeviceInfo
+	var wg sync.WaitGroup
+	wg.Add(3)
 	go func() {
-		defer close(rootChan)
-		rootChan <- *d.GetRoot(*device)
+		defer wg.Done()
+		deviceInfo.Root = *d.GetRoot(*device)
 	}()
 	go func() {
-		defer close(batteryChan)
-		batteryChan <- *d.GetBattery(*device)
+		defer wg.Done()
+		deviceInfo.Battery = *d.GetBattery(*device)
 	}()
 	go func() {
-		defer close(devicePropChan)
-		devicePropChan <- *d.GetDeviceProp(*device)
+		defer wg.Done()
+		deviceInfo.DeviceProp = *d.GetDeviceProp(*device)
 	}()
-	deviceInfo.Root = <-rootChan
-	deviceInfo.Battery = <-batteryChan
-	deviceInfo.DeviceProp = <-devicePropChan
-	return deviceInfo, nil
+	wg.Wait()
+	return &deviceInfo, nil
 }

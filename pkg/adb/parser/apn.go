@@ -13,6 +13,18 @@ type Apn struct {
 	ApnName string `json:"apn"`
 }
 
+func (a *Apn) MarshalJSON() ([]byte, error) {
+	if a.Name == "" && a.ApnName == "" {
+		return []byte("{}"), nil
+	}
+	return json.Marshal(struct {
+		Name    string `json:"name"`
+		ApnName string `json:"apn"`
+	}{
+		Name:    a.Name,
+		ApnName: a.ApnName,
+	})
+}
 func NewApn(rawApn string) *Apn {
 	apn := &Apn{}
 	extrackedApn := extractApn(rawApn)
