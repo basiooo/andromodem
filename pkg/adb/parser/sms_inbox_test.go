@@ -27,16 +27,6 @@ func TestParseSmsInbox(t *testing.T) {
 		Date:    "2024-04-13 13:47:08",
 	}}
 	smsInboxs := parser.NewSMSInbox(data)
-	actual := smsInboxs
+	actual := *smsInboxs
 	assert.Equal(t, expected, actual)
 }
-
-// func TestParseRootNotRooted(t *testing.T) {
-// 	data := "/system/bin/sh: su: not found"
-// 	expected := parser.Root{
-// 		IsRooted: false,
-// 	}
-// 	rootInfo := parser.NewRoot(data)
-// 	actual := *rootInfo
-// 	assert.Equal(t, expected, actual)
-// }
