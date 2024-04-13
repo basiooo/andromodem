@@ -15,7 +15,7 @@ type SMSInbox struct {
 	Date    string
 }
 
-func NewSMSInbox(rawSmsInbox string) []SMSInbox {
+func NewSMSInbox(rawSmsInbox string) *[]SMSInbox {
 	splitSms := splitSmsinbox(rawSmsInbox)
 	smsInboxs := parseSmsInbox(splitSms)
 	return smsInboxs
@@ -45,7 +45,7 @@ func formatDate(timestamp string) string {
 	return localTime.Format("2006-01-02 15:04:05")
 }
 
-func parseSmsInbox(rawSmsInboxs []string) []SMSInbox {
+func parseSmsInbox(rawSmsInboxs []string) *[]SMSInbox {
 	reAddress := regexp.MustCompile(`address=([^,]+)`)
 	reBody := regexp.MustCompile(`body=([\s\S]*?), date`)
 	reDate := regexp.MustCompile(`date=(\d+)`)
@@ -66,5 +66,5 @@ func parseSmsInbox(rawSmsInboxs []string) []SMSInbox {
 			smsInboxs = append(smsInboxs, smsInbox)
 		}
 	}
-	return smsInboxs
+	return &smsInboxs
 }

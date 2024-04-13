@@ -24,7 +24,7 @@ func NewMessageService(adb *adb.Adb, adbCommand adbcommand.AdbCommand) MessageSe
 		AdbCommand: adbCommand,
 	}
 }
-func (d *MessageServiceImpl) GetSmsInbox(device goadb.Device) []parser.SMSInbox {
+func (d *MessageServiceImpl) GetSmsInbox(device goadb.Device) *[]parser.SMSInbox {
 	rawSmsInbox, _ := d.AdbCommand.GetSmsInbox(device)
 	smsInboxs := parser.NewSMSInbox(rawSmsInbox)
 	return smsInboxs
@@ -36,7 +36,7 @@ func (d *MessageServiceImpl) GetInbox(serial string) (*model.MessageSMSInbox, er
 		return nil, util.ErrDeviceNotFound
 	}
 	smsInbox := &model.MessageSMSInbox{}
-	smsInboxChan := make(chan []parser.SMSInbox)
+	smsInboxChan := make(chan *[]parser.SMSInbox)
 	go func() {
 		defer close(smsInboxChan)
 		smsInboxChan <- d.GetSmsInbox(*device)
