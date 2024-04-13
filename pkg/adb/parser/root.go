@@ -14,18 +14,18 @@ type Root struct {
 
 func NewRoot(rawRoot string) *Root {
 	root := &Root{}
-	root.IsRooted = root.isRooted(rawRoot)
+	root.IsRooted = isRooted(rawRoot)
 	if root.IsRooted {
-		root.RootDetail = root.extractRootDetail(rawRoot)
+		root.RootDetail = parseRootDetail(rawRoot)
 	}
 	return root
 }
 
-func (r *Root) isRooted(rawRoot string) bool {
+func isRooted(rawRoot string) bool {
 	return !strings.Contains(rawRoot, "not found") && strings.TrimSpace(rawRoot) != ""
 }
 
-func (r *Root) extractRootDetail(rawRoot string) *RootDetail {
+func parseRootDetail(rawRoot string) *RootDetail {
 	rootDetail := strings.Split(strings.TrimSpace(rawRoot), ":")
 	if len(rootDetail) == 2 {
 		return &RootDetail{
