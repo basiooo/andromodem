@@ -7,12 +7,9 @@ import (
 )
 
 func StartServer() error {
-	adbClient := adb.NewAdbClient()
-	err := adbClient.Start()
-	if err != nil {
-		return err
-	}
-	router := NewRouter(adbClient)
-	err = http.ListenAndServe(":3000", router.Setup())
+	adb := adb.New()
+	adb.Start()
+	router := NewRouter(adb)
+	err := http.ListenAndServe(":3000", router.Setup())
 	return err
 }

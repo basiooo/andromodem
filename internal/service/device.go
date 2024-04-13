@@ -20,9 +20,9 @@ type DeviceServiceImpl struct {
 	AdbCommand adbcommand.AdbCommand
 }
 
-func NewDeviceService(adbClient *adb.Adb, adbCommand adbcommand.AdbCommand) DeviceService {
+func NewDeviceService(adb *adb.Adb, adbCommand adbcommand.AdbCommand) DeviceService {
 	return &DeviceServiceImpl{
-		Adb:        adbClient,
+		Adb:        adb,
 		AdbCommand: adbCommand,
 	}
 }

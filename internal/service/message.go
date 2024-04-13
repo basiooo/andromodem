@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	goadb "github.com/abccyz/goadb"
 	"github.com/basiooo/andromodem/internal/adb"
 	"github.com/basiooo/andromodem/internal/model"
@@ -20,15 +18,14 @@ type MessageServiceImpl struct {
 	AdbCommand adbcommand.AdbCommand
 }
 
-func NewMessageService(adbClient *adb.Adb, adbCommand adbcommand.AdbCommand) MessageService {
+func NewMessageService(adb *adb.Adb, adbCommand adbcommand.AdbCommand) MessageService {
 	return &MessageServiceImpl{
-		Adb:        adbClient,
+		Adb:        adb,
 		AdbCommand: adbCommand,
 	}
 }
 func (d *MessageServiceImpl) GetSmsInbox(device goadb.Device) []parser.SMSInbox {
 	rawSmsInbox, _ := d.AdbCommand.GetSmsInbox(device)
-	fmt.Println(rawSmsInbox)
 	smsInboxs := parser.NewSMSInbox(rawSmsInbox)
 	return smsInboxs
 }

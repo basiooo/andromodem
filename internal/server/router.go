@@ -19,25 +19,29 @@ type routerImpl struct {
 	*adb.Adb
 }
 
-func NewRouter(adbClient *adb.Adb) Router {
+func NewRouter(adb *adb.Adb) Router {
 	return &routerImpl{
-		Adb: adbClient,
+		Adb: adb,
 	}
 }
 func (r *routerImpl) Setup() *chi.Mux {
+	adb := r.Adb
 	router := chi.NewRouter()
 	router.Use(
 		middleware.Logger,
 		middleware.StripSlashes,
 		appMiddleware.Recoverer,
 	)
-	adbcommand := adbcommand.NewAdbCommand()
-	devicesService := service.NewDeviceService(r.Adb, *adbcommand)
-	devicesHandler := handler.NewDeviceHander(devicesService)
-	messageService := service.NewMessageService(r.Adb, *adbcommand)
-	messageHandler := handler.NewMessageHander(messageService)
-
+	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Is main page"))
+	})
 	router.Route("/api", func(r chi.Router) {
+		r.Use(appMiddleware.AdbChecker(adb))
+		adbcommand := adbcommand.NewAdbCommand()
+		devicesService := service.NewDeviceService(adb, *adbcommand)
+		devicesHandler := handler.NewDeviceHander(devicesService)
+		messageService := service.NewMessageService(adb, *adbcommand)
+		messageHandler := handler.NewMessageHander(messageService)
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("OK"))
 		})
