@@ -52,6 +52,7 @@ func (r *routerImpl) Setup() *chi.Mux {
 		r.Get("/devices/{serial}/inbox", messageHandler.GetSmsInbox)
 		r.Get("/devices/{serial}/network/airplane", networkHandler.GetAirplaneModeStatus)
 		r.Put("/devices/{serial}/network/airplane", networkHandler.ToggleAirplaneMode)
+		r.Get("/devices/{serial}/network", networkHandler.GetNetworkInfo)
 	})
 	return router
 }

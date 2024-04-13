@@ -13,6 +13,7 @@ import (
 type NetworkHandler interface {
 	GetAirplaneModeStatus(http.ResponseWriter, *http.Request)
 	ToggleAirplaneMode(http.ResponseWriter, *http.Request)
+	GetNetworkInfo(http.ResponseWriter, *http.Request)
 }
 
 type NetworkHandlerImpl struct {
@@ -49,4 +50,17 @@ func (d *NetworkHandlerImpl) ToggleAirplaneMode(writter http.ResponseWriter, req
 		return
 	}
 	util.WriteToResponseBody(writter, airplaneModeStatus, http.StatusOK)
+}
+
+func (d *NetworkHandlerImpl) GetNetworkInfo(writter http.ResponseWriter, request *http.Request) {
+	serial := chi.URLParam(request, "serial")
+	networkInfo, err := d.NetworkService.GetNetworkInfo(serial)
+	if err != nil && errors.Is(err, util.ErrDeviceNotFound) {
+		response := model.ErrorResponse{
+			Error: "Device Not Found",
+		}
+		util.WriteToResponseBody(writter, response, http.StatusNotFound)
+		return
+	}
+	util.WriteToResponseBody(writter, networkInfo, http.StatusOK)
 }

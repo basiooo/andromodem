@@ -16,6 +16,7 @@ import (
 type NetworkService interface {
 	GetAirplaneModeStatus(string) (*parser.AirplaneModeStatus, error)
 	ToggleAirplaneMode(string) (*model.AirplaneModeResponse, error)
+	GetNetworkInfo(string) (*model.NetworkInfo, error)
 }
 
 type NetworkServiceImpl struct {
@@ -34,6 +35,12 @@ func (d *NetworkServiceImpl) getAirplaneModeStatus(device goadb.Device) *parser.
 	rawAirplaneModeStatus, _ := d.AdbCommand.GetAirplaneModeStatus(device)
 	airplaneModeStatus := parser.NewAirplaneModeStatus(rawAirplaneModeStatus)
 	return airplaneModeStatus
+}
+
+func (d *NetworkServiceImpl) getApn(device goadb.Device) *parser.Apn {
+	rawApn, _ := d.AdbCommand.GetApn(device)
+	apn := parser.NewApn(rawApn)
+	return apn
 }
 
 func (d *NetworkServiceImpl) EnableAirplaneMode(device goadb.Device) error {
@@ -100,4 +107,38 @@ func (d *NetworkServiceImpl) ToggleAirplaneMode(serial string) (*model.AirplaneM
 		res.Error = err.Error()
 	}
 	return &res, err
+}
+
+func (d *NetworkServiceImpl) getCarriers(device *goadb.Device) []parser.Carrier {
+	rawConnectionsState, _ := d.AdbCommand.GetMobileDataState(*device)
+	rawCarriersName, _ := d.AdbCommand.GetCarriersName(*device)
+	rawSignalsStrength, _ := d.AdbCommand.GetSignalStrength(*device)
+	rawCarriers := parser.RawCarriers{
+		RawConnectionsState: rawConnectionsState,
+		RawCarriersName:     rawCarriersName,
+		RawSignalsStrength:  rawSignalsStrength,
+	}
+	carriersInfo := parser.NewCarriers(rawCarriers)
+	return *carriersInfo
+}
+
+func (d *NetworkServiceImpl) GetNetworkInfo(serial string) (*model.NetworkInfo, error) {
+	device, err := d.Adb.GetDeviceBySerial(serial)
+	if err != nil {
+		return nil, util.ErrDeviceNotFound
+	}
+	networkInfo := model.NetworkInfo{}
+	carriersChan := make(chan []parser.Carrier)
+	apnChan := make(chan *parser.Apn)
+	go func() {
+		defer close(carriersChan)
+		carriersChan <- d.getCarriers(device)
+	}()
+	go func() {
+		defer close(apnChan)
+		apnChan <- d.getApn(*device)
+	}()
+	networkInfo.Carriers = <-carriersChan
+	networkInfo.Apn = *<-apnChan
+	return &networkInfo, nil
 }

@@ -74,3 +74,39 @@ func (a *AdbCommand) DisableAirplaneMode(device goadb.Device) (string, error) {
 	}
 	return disableAirplaneMode, nil
 }
+
+func (a *AdbCommand) GetMobileDataState(device goadb.Device) (string, error) {
+	mobileDataState, err := device.RunCommand("dumpsys telephony.registry | grep 'mDataConnectionState=' | cut -d'=' -f2 | grep -v '^$'")
+	if err != nil {
+		logrus.WithField("location", "AdbCommand.GetMobileDataState").Errorf("GetMobileDataState(): failed get device mobile data state: %v", err)
+		return "", err
+	}
+	return mobileDataState, nil
+}
+
+func (a *AdbCommand) GetCarriersName(device goadb.Device) (string, error) {
+	carriersName, err := device.RunCommand("getprop gsm.sim.operator.alpha")
+	if err != nil {
+		logrus.WithField("location", "AdbCommand.GetCarriersName").Errorf("GetCarriersName(): failed get device carriers name: %v", err)
+		return "", err
+	}
+	return carriersName, nil
+}
+
+func (a *AdbCommand) GetSignalStrength(device goadb.Device) (string, error) {
+	signalStrength, err := device.RunCommand(`dumpsys telephony.registry | grep "mSignalStrength=SignalStrength" | sed 's/mSignalStrength=SignalStrength://'`)
+	if err != nil {
+		logrus.WithField("location", "AdbCommand.GetSignalStrength").Errorf("GetSignalStrength(): failed get device signal strength: %v", err)
+		return "", err
+	}
+	return signalStrength, nil
+}
+
+func (a *AdbCommand) GetApn(device goadb.Device) (string, error) {
+	apn, err := device.RunCommand("content query --uri content://telephony/carriers/preferapn")
+	if err != nil {
+		logrus.WithField("location", "AdbCommand.GetApn").Errorf("GetApn(): failed get device Apn: %v", err)
+		return "", err
+	}
+	return apn, nil
+}
