@@ -30,7 +30,7 @@ func (d *DeviceHandlerImpl) GetDevices(writter http.ResponseWriter, request *htt
 	response := model.DevicesResponse{
 		Devices: devices,
 	}
-	util.WriteToResponseBody(writter, response, 200)
+	util.WriteToResponseBody(writter, response, http.StatusOK)
 }
 
 func (d *DeviceHandlerImpl) GetDeviceInfo(writter http.ResponseWriter, request *http.Request) {
@@ -43,5 +43,5 @@ func (d *DeviceHandlerImpl) GetDeviceInfo(writter http.ResponseWriter, request *
 		util.WriteToResponseBody(writter, response, http.StatusNotFound)
 		return
 	}
-	util.WriteToResponseBody(writter, deviceInfo, 200)
+	util.WriteToResponseBody(writter, deviceInfo, http.StatusOK)
 }

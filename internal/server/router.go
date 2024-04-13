@@ -42,12 +42,16 @@ func (r *routerImpl) Setup() *chi.Mux {
 		devicesHandler := handler.NewDeviceHander(devicesService)
 		messageService := service.NewMessageService(adb, *adbcommand)
 		messageHandler := handler.NewMessageHander(messageService)
+		networkService := service.NewNetworkService(adb, *adbcommand)
+		networkHandler := handler.NewNetworkHander(networkService)
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("OK"))
 		})
 		r.Get("/devices", devicesHandler.GetDevices)
 		r.Get("/devices/{serial}", devicesHandler.GetDeviceInfo)
 		r.Get("/devices/{serial}/inbox", messageHandler.GetSmsInbox)
+		r.Get("/devices/{serial}/network/airplane", networkHandler.GetAirplaneModeStatus)
+		r.Put("/devices/{serial}/network/airplane", networkHandler.ToggleAirplaneMode)
 	})
 	return router
 }
