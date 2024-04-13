@@ -96,6 +96,8 @@ func (d *NetworkServiceImpl) ToggleAirplaneMode(serial string) (*model.AirplaneM
 	res := model.AirplaneModeResponse{}
 	res.Enabled = isEnabled
 	res.Success = isSuccess
-	res.Error = err.Error()
+	if err != nil {
+		res.Error = err.Error()
+	}
 	return &res, err
 }
