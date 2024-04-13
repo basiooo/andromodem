@@ -38,3 +38,12 @@ func (a *AdbCommand) GetDeviceProp(device goadb.Device) (string, error) {
 	}
 	return deviceProps, nil
 }
+
+func (a *AdbCommand) GetSmsInbox(device goadb.Device) (string, error) {
+	inbox, err := device.RunCommand("content query --uri content://sms/inbox --projection address,body,date")
+	if err != nil {
+		logrus.WithField("location", "AdbDeviceCommand.GetSmsInbox").Errorf("GetSmsInbox(): failed get sms inbox: %v", err)
+		return "", err
+	}
+	return inbox, nil
+}

@@ -34,6 +34,8 @@ func (r *routerImpl) Setup() *chi.Mux {
 	adbcommand := adbcommand.NewAdbCommand()
 	devicesService := service.NewDeviceService(r.Adb, *adbcommand)
 	devicesHandler := handler.NewDeviceHander(devicesService)
+	messageService := service.NewMessageService(r.Adb, *adbcommand)
+	messageHandler := handler.NewMessageHander(messageService)
 
 	router.Route("/api", func(r chi.Router) {
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +43,7 @@ func (r *routerImpl) Setup() *chi.Mux {
 		})
 		r.Get("/devices", devicesHandler.GetDevices)
 		r.Get("/devices/{serial}", devicesHandler.GetDeviceInfo)
+		r.Get("/devices/{serial}/inbox", messageHandler.GetSmsInbox)
 	})
 	return router
 }
