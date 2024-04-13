@@ -47,3 +47,30 @@ func (a *AdbCommand) GetSmsInbox(device goadb.Device) (string, error) {
 	}
 	return inbox, nil
 }
+
+func (a *AdbCommand) GetAirplaneModeStatus(device goadb.Device) (string, error) {
+	airplaneModeStatus, err := device.RunCommand("cmd connectivity airplane-mode")
+	if err != nil {
+		logrus.WithField("location", "AdbDeviceCommand.GetAirplaneModeStatus").Errorf("GetAirplaneModeStatus(): failed get airplane mode status: %v", err)
+		return "", err
+	}
+	return airplaneModeStatus, nil
+}
+
+func (a *AdbCommand) EnableAirplaneMode(device goadb.Device) (string, error) {
+	enableAirplaneMode, err := device.RunCommand("cmd connectivity airplane-mode enable")
+	if err != nil {
+		logrus.WithField("location", "AdbDeviceCommand.EnableAirplaneMode").Errorf("EnableAirplaneMode(): failed enable airplane mode: %v", err)
+		return "", err
+	}
+	return enableAirplaneMode, nil
+}
+
+func (a *AdbCommand) DisableAirplaneMode(device goadb.Device) (string, error) {
+	disableAirplaneMode, err := device.RunCommand("cmd connectivity airplane-mode disable")
+	if err != nil {
+		logrus.WithField("location", "AdbDeviceCommand.DisableAirplaneMode").Errorf("DisableAirplaneMode(): failed enable airplane mode: %v", err)
+		return "", err
+	}
+	return disableAirplaneMode, nil
+}

@@ -34,5 +34,5 @@ func (d *MessageHandlerImpl) GetSmsInbox(writter http.ResponseWriter, request *h
 		util.WriteToResponseBody(writter, response, http.StatusNotFound)
 		return
 	}
-	util.WriteToResponseBody(writter, smsInbox, 200)
+	util.WriteToResponseBody(writter, smsInbox, http.StatusOK)
 }
