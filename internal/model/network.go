@@ -2,11 +2,14 @@ package model
 
 import "github.com/basiooo/andromodem/pkg/adb/parser"
 
-type AirplaneModeResponse struct {
+type BaseToggleResponse struct {
 	Success bool   `json:"success"`
 	Enabled bool   `json:"enabled"`
 	Error   string `json:"errors,omitempty"`
 }
+type ToggleAirplaneModeResponse BaseToggleResponse
+type ToggleMobileDataResponse BaseToggleResponse
+
 type NetworkInfo struct {
 	AirplaneMode bool             `json:"airplane_mode"`
 	Apn          parser.Apn       `json:"APN"`
