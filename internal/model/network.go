@@ -3,9 +3,7 @@ package model
 import "github.com/basiooo/andromodem/pkg/adb/parser"
 
 type BaseToggleResponse struct {
-	Success bool   `json:"success"`
-	Enabled bool   `json:"enabled"`
-	Error   string `json:"errors,omitempty"`
+	Enabled bool `json:"enabled"`
 }
 type ToggleAirplaneModeResponse BaseToggleResponse
 type ToggleMobileDataResponse BaseToggleResponse

@@ -16,8 +16,9 @@ func AdbChecker(adb *adb.Adb) func(http.Handler) http.Handler {
 				if adb.AdbIsInstalled() {
 					errMessage = "The ADB server is currently not running on your computer. Please restart Andromodem to activate the ADB server and enable the use of this program."
 				}
-				webResponse := model.ErrorResponse{
-					Error: errMessage,
+				webResponse := model.BaseResponse{
+					Status:  "Failed",
+					Message: errMessage,
 				}
 				util.WriteToResponseBody(writer, webResponse, http.StatusInternalServerError)
 				return

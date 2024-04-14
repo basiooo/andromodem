@@ -76,7 +76,9 @@ func (d *NetworkServiceImpl) ToggleAirplaneMode(serial string) (*model.ToggleAir
 		return nil, util.ErrDeviceNotFound
 	}
 	isEnabled := d.getAirplaneModeStatus(*device).Enabled
-	isSuccess := true
+	result := &model.ToggleAirplaneModeResponse{
+		Enabled: isEnabled,
+	}
 	if isEnabled {
 		_, err = d.AdbCommand.DisableAirplaneMode(*device)
 	} else {
@@ -90,26 +92,19 @@ func (d *NetworkServiceImpl) ToggleAirplaneMode(serial string) (*model.ToggleAir
 		for {
 			if d.getAirplaneModeStatus(*device).Enabled != isEnabled {
 				isEnabled = !isEnabled
-				isSuccess = true
 				break outerLoop
 			}
 			select {
 			case <-ctx.Done():
 				err = errors.New("cannot change airplane mode state")
-				isSuccess = false
 				break outerLoop
 			default:
 			}
 			time.Sleep(1 * time.Second)
 		}
 	}
-	res := model.ToggleAirplaneModeResponse{}
-	res.Enabled = isEnabled
-	res.Success = isSuccess
-	if err != nil {
-		res.Error = err.Error()
-	}
-	return &res, err
+	result.Enabled = isEnabled
+	return result, err
 }
 
 func (d *NetworkServiceImpl) getCarriers(device *goadb.Device) []parser.Carrier {
@@ -170,44 +165,40 @@ func (d *NetworkServiceImpl) ToggleMobileData(serial string) (*model.ToggleMobil
 		return nil, util.ErrDeviceNotFound
 	}
 	isEnabled := d.deviceHasMobileDataEnable(device)
-	isSuccess := false
 	airplaneModeStatusEnabled := d.getAirplaneModeStatus(*device).Enabled
+	result := &model.ToggleMobileDataResponse{
+		Enabled: isEnabled,
+	}
 	if airplaneModeStatusEnabled {
 		err = errors.New("airplane mode is currently active, unable to perform action. Please disable airplane mode first.")
+		return result, err
+	}
+	if isEnabled {
+		_, err = d.AdbCommand.DisableMobileData(*device)
 	} else {
-		if isEnabled {
-			_, err = d.AdbCommand.DisableMobileData(*device)
-		} else {
-			_, err = d.AdbCommand.EnableMobileData(*device)
-		}
-		if err == nil {
-			timeout := 10 * time.Second
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
-			defer cancel()
-		outerLoop:
-			for {
-				if d.deviceHasMobileDataEnable(device) != isEnabled {
-					isEnabled = !isEnabled
-					isSuccess = true
-					break outerLoop
-				}
-				select {
-				case <-ctx.Done():
-					err = errors.New("cannot change mobile data state")
-					isSuccess = false
-					break outerLoop
-				default:
-				}
-				time.Sleep(1 * time.Second)
+		_, err = d.AdbCommand.EnableMobileData(*device)
+	}
+
+	if err == nil {
+		timeout := 10 * time.Second
+		ctx, cancel := context.WithTimeout(context.Background(), timeout)
+		defer cancel()
+	outerLoop:
+		for {
+			if d.deviceHasMobileDataEnable(device) != isEnabled {
+				isEnabled = !isEnabled
+				break outerLoop
 			}
+			select {
+			case <-ctx.Done():
+				err = errors.New("cannot change mobile data state")
+				break outerLoop
+			default:
+			}
+			time.Sleep(1 * time.Second)
 		}
 	}
 
-	res := model.ToggleMobileDataResponse{}
-	res.Enabled = isEnabled
-	res.Success = isSuccess
-	if err != nil {
-		res.Error = err.Error()
-	}
-	return &res, err
+	result.Enabled = isEnabled
+	return result, err
 }

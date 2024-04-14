@@ -28,11 +28,13 @@ func (d *MessageHandlerImpl) GetSmsInbox(writter http.ResponseWriter, request *h
 	serial := chi.URLParam(request, "serial")
 	smsInbox, err := d.MessageService.GetInbox(serial)
 	if err != nil && errors.Is(err, util.ErrDeviceNotFound) {
-		response := model.ErrorResponse{
-			Error: "Device Not Found",
-		}
-		util.WriteToResponseBody(writter, response, http.StatusNotFound)
+		util.MakeDeviceNotFoundResponse(writter)
 		return
 	}
-	util.WriteToResponseBody(writter, smsInbox, http.StatusOK)
+	response := model.BaseResponse{
+		Status:  "Success",
+		Message: "Inbox SMS list retrieved successfully",
+		Data:    smsInbox,
+	}
+	util.WriteToResponseBody(writter, response, http.StatusOK)
 }

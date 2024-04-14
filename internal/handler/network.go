@@ -31,50 +31,77 @@ func (d *NetworkHandlerImpl) GetAirplaneModeStatus(writter http.ResponseWriter, 
 	serial := chi.URLParam(request, "serial")
 	airplaneModeStatus, err := d.NetworkService.GetAirplaneModeStatus(serial)
 	if err != nil && errors.Is(err, util.ErrDeviceNotFound) {
-		response := model.ErrorResponse{
-			Error: "Device Not Found",
-		}
-		util.WriteToResponseBody(writter, response, http.StatusNotFound)
+		util.MakeDeviceNotFoundResponse(writter)
 		return
 	}
-	util.WriteToResponseBody(writter, airplaneModeStatus, http.StatusOK)
+	response := model.BaseResponse{
+		Status:  "Success",
+		Message: "Airplane mode status retrieved successfully",
+		Data:    airplaneModeStatus,
+	}
+	util.WriteToResponseBody(writter, response, http.StatusOK)
 }
 
 func (d *NetworkHandlerImpl) ToggleAirplaneMode(writter http.ResponseWriter, request *http.Request) {
 	serial := chi.URLParam(request, "serial")
 	airplaneModeStatus, err := d.NetworkService.ToggleAirplaneMode(serial)
-	if err != nil && errors.Is(err, util.ErrDeviceNotFound) {
-		response := model.ErrorResponse{
-			Error: "Device Not Found",
-		}
-		util.WriteToResponseBody(writter, response, http.StatusNotFound)
-		return
+	message := "Success disable airplane mode!"
+	if airplaneModeStatus.Enabled {
+		message = "Success enable airplane mode!"
 	}
-	util.WriteToResponseBody(writter, airplaneModeStatus, http.StatusOK)
+	response := model.BaseResponse{
+		Status:  "Success",
+		Message: message,
+		Data:    airplaneModeStatus,
+	}
+	if err != nil {
+		if errors.Is(err, util.ErrDeviceNotFound) {
+			util.MakeDeviceNotFoundResponse(writter)
+			return
+		} else {
+			response.Status = "Failed"
+			response.Message = err.Error()
+		}
+	}
+	util.WriteToResponseBody(writter, response, http.StatusOK)
 }
 
 func (d *NetworkHandlerImpl) GetNetworkInfo(writter http.ResponseWriter, request *http.Request) {
 	serial := chi.URLParam(request, "serial")
 	networkInfo, err := d.NetworkService.GetNetworkInfo(serial)
 	if err != nil && errors.Is(err, util.ErrDeviceNotFound) {
-		response := model.ErrorResponse{
-			Error: "Device Not Found",
-		}
-		util.WriteToResponseBody(writter, response, http.StatusNotFound)
+		util.MakeDeviceNotFoundResponse(writter)
 		return
 	}
-	util.WriteToResponseBody(writter, networkInfo, http.StatusOK)
+	response := model.BaseResponse{
+		Status:  "Success",
+		Message: "Network information retrieved successfully",
+		Data:    networkInfo,
+	}
+	util.WriteToResponseBody(writter, response, http.StatusOK)
 }
 
 func (d *NetworkHandlerImpl) ToggleMobileData(writter http.ResponseWriter, request *http.Request) {
 	serial := chi.URLParam(request, "serial")
 	mobileData, err := d.NetworkService.ToggleMobileData(serial)
-	if err != nil && errors.Is(err, util.ErrDeviceNotFound) {
-		response := model.ErrorResponse{
-			Error: "Device Not Found",
-		}
-		util.WriteToResponseBody(writter, response, http.StatusNotFound)
-		return
+
+	message := "Success disable mobile data!"
+	if mobileData.Enabled {
+		message = "Success enable mobile data!"
 	}
-	util.WriteToResponseBody(writter, mobileData, http.StatusOK)
+	response := model.BaseResponse{
+		Status:  "Success",
+		Message: message,
+		Data:    mobileData,
+	}
+	if err != nil {
+		if errors.Is(err, util.ErrDeviceNotFound) {
+			util.MakeDeviceNotFoundResponse(writter)
+			return
+		} else {
+			response.Status = "Failed"
+			response.Message = err.Error()
+		}
+	}
+	util.WriteToResponseBody(writter, response, http.StatusOK)
 }

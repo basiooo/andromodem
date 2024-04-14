@@ -16,10 +16,10 @@ func Recoverer(next http.Handler) http.Handler {
 					if message, ok := err.(string); ok {
 						errorMessage = message
 					}
-					webResponse := model.ErrorResponse{
-						Error: errorMessage,
+					webResponse := model.BaseResponse{
+						Status:  "Failed",
+						Message: errorMessage,
 					}
-
 					util.WriteToResponseBody(writer, webResponse, http.StatusInternalServerError)
 				}(writer, request, rvr)
 			}

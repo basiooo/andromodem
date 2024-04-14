@@ -27,8 +27,12 @@ func NewDeviceHander(deviceService service.DeviceService) DeviceHandler {
 
 func (d *DeviceHandlerImpl) GetDevices(writter http.ResponseWriter, request *http.Request) {
 	devices, _ := d.DeviceService.GetDevices()
-	response := model.DevicesResponse{
-		Devices: devices,
+	response := model.BaseResponse{
+		Status:  "Success",
+		Message: "Device list retrieved successfully",
+		Data: model.DevicesResponse{
+			Devices: devices,
+		},
 	}
 	util.WriteToResponseBody(writter, response, http.StatusOK)
 }
@@ -37,11 +41,13 @@ func (d *DeviceHandlerImpl) GetDeviceInfo(writter http.ResponseWriter, request *
 	serial := chi.URLParam(request, "serial")
 	deviceInfo, err := d.DeviceService.GetDeviceInfo(serial)
 	if err != nil && errors.Is(err, util.ErrDeviceNotFound) {
-		response := model.ErrorResponse{
-			Error: "Device Not Found",
-		}
-		util.WriteToResponseBody(writter, response, http.StatusNotFound)
+		util.MakeDeviceNotFoundResponse(writter)
 		return
 	}
-	util.WriteToResponseBody(writter, deviceInfo, http.StatusOK)
+	response := model.BaseResponse{
+		Status:  "Success",
+		Message: "Device information retrieved successfully",
+		Data:    deviceInfo,
+	}
+	util.WriteToResponseBody(writter, response, http.StatusOK)
 }
