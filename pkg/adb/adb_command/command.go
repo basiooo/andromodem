@@ -110,3 +110,12 @@ func (a *AdbCommand) GetApn(device goadb.Device) (string, error) {
 	}
 	return apn, nil
 }
+
+func (a *AdbCommand) GetNetInterface(device goadb.Device, interfaceName string) (string, error) {
+	interfaceData, err := device.RunCommand("ifconfig " + interfaceName)
+	if err != nil {
+		logrus.WithField("location", "AdbCommand.GetNetInterface").Errorf("GetNetInterface(): failed get network interface: %v", err)
+		return "", err
+	}
+	return interfaceData, nil
+}

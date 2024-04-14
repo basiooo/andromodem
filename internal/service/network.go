@@ -42,6 +42,17 @@ func (d *NetworkServiceImpl) getApn(device goadb.Device) *parser.Apn {
 	apn := parser.NewApn(rawApn)
 	return apn
 }
+func (d *NetworkServiceImpl) getMobileDataIp(device goadb.Device) *parser.IpAddress {
+	interfaceNames := [2]string{"rmnet_data0", "rmnet_data1"}
+	for _, v := range interfaceNames {
+		rawApn, _ := d.AdbCommand.GetNetInterface(device, v)
+		ipAddress := parser.NewIpAddress(rawApn)
+		if ipAddress.Ip != "" {
+			return ipAddress
+		}
+	}
+	return &parser.IpAddress{}
+}
 
 func (d *NetworkServiceImpl) EnableAirplaneMode(device goadb.Device) error {
 	_, err := d.AdbCommand.EnableAirplaneMode(device)
@@ -130,6 +141,7 @@ func (d *NetworkServiceImpl) GetNetworkInfo(serial string) (*model.NetworkInfo, 
 	networkInfo := model.NetworkInfo{}
 	carriersChan := make(chan []parser.Carrier)
 	apnChan := make(chan *parser.Apn)
+	mobileDataIpChan := make(chan *parser.IpAddress)
 	go func() {
 		defer close(carriersChan)
 		carriersChan <- d.getCarriers(device)
@@ -138,7 +150,13 @@ func (d *NetworkServiceImpl) GetNetworkInfo(serial string) (*model.NetworkInfo, 
 		defer close(apnChan)
 		apnChan <- d.getApn(*device)
 	}()
+	go func() {
+		defer close(mobileDataIpChan)
+		mobileDataIpChan <- d.getMobileDataIp(*device)
+	}()
 	networkInfo.Carriers = <-carriersChan
 	networkInfo.Apn = *<-apnChan
+	mobileDataIp := <-mobileDataIpChan
+	networkInfo.Ip = mobileDataIp.Ip
 	return &networkInfo, nil
 }
