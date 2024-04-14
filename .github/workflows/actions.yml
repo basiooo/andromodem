@@ -1,4 +1,4 @@
-name: Audit
+name: bBuild, Lint and Test
 
 on: push
 
@@ -25,3 +25,8 @@ jobs:
 
     - name: Run go test
       run: go test ./...
+    
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v4
+      with:
+        version: v4.0.0
