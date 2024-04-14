@@ -1,9 +1,9 @@
-name: bBuild, Lint and Test
+name: Build, Lint and Test
 
 on: push
 
 jobs:
-  audit:
+  Check:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
