@@ -26,7 +26,7 @@ func (a *Adb) Start() error {
 	err = client.StartServer()
 	if err != nil && client == nil {
 		logrus.Info("Trying start a ADB client manualy")
-		cmd := exec.Command("adb", "start-client")
+		cmd := exec.Command("adb", "start-server")
 		err = cmd.Run()
 		if err != nil {
 			logrus.Errorf("Failed start ADB client manualy: %v", err)

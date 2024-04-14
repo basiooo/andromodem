@@ -10,6 +10,7 @@ type DeviceProp struct {
 	Brand          string `json:"brand"`
 	Name           string `json:"name"`
 	AndroidVersion string `json:"android_version"`
+	Fingerprint    string `json:"fingerprint"`
 }
 
 func NewDeviceProp(rawDeviceProp string) *DeviceProp {
@@ -18,6 +19,7 @@ func NewDeviceProp(rawDeviceProp string) *DeviceProp {
 	deviceProps.Brand = GetPropValueByName(rawDeviceProp, "ro.product.brand")
 	deviceProps.Name = GetPropValueByName(rawDeviceProp, "ro.product.name")
 	deviceProps.AndroidVersion = GetPropValueByName(rawDeviceProp, "ro.build.version.release")
+	deviceProps.Fingerprint = GetPropValueByName(rawDeviceProp, "ro.system.build.fingerprint")
 	return &deviceProps
 }
 
