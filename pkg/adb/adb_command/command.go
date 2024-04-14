@@ -119,3 +119,21 @@ func (a *AdbCommand) GetNetInterface(device goadb.Device, interfaceName string) 
 	}
 	return interfaceData, nil
 }
+
+func (a *AdbCommand) EnableMobileData(device goadb.Device) (string, error) {
+	mobileData, err := device.RunCommand(`svc data enable`)
+	if err != nil {
+		logrus.WithField("location", "AdbCommand.EnableMobileData").Errorf("EnableMobileData(): failed enable mobile data: %v", err)
+		return "", err
+	}
+	return mobileData, nil
+}
+
+func (a *AdbCommand) DisableMobileData(device goadb.Device) (string, error) {
+	mobileData, err := device.RunCommand(`svc data disable`)
+	if err != nil {
+		logrus.WithField("location", "AdbCommand.DisableMobileData").Errorf("DisableMobileData(): failed enable mobile data: %v", err)
+		return "", err
+	}
+	return mobileData, nil
+}

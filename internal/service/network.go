@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	goadb "github.com/abccyz/goadb"
@@ -15,8 +16,9 @@ import (
 
 type NetworkService interface {
 	GetAirplaneModeStatus(string) (*parser.AirplaneModeStatus, error)
-	ToggleAirplaneMode(string) (*model.AirplaneModeResponse, error)
+	ToggleAirplaneMode(string) (*model.ToggleAirplaneModeResponse, error)
 	GetNetworkInfo(string) (*model.NetworkInfo, error)
+	ToggleMobileData(string) (*model.ToggleMobileDataResponse, error)
 }
 
 type NetworkServiceImpl struct {
@@ -54,16 +56,6 @@ func (d *NetworkServiceImpl) getMobileDataIp(device goadb.Device) *parser.IpAddr
 	return &parser.IpAddress{}
 }
 
-func (d *NetworkServiceImpl) EnableAirplaneMode(device goadb.Device) error {
-	_, err := d.AdbCommand.EnableAirplaneMode(device)
-	return err
-}
-
-func (d *NetworkServiceImpl) DisableAirplaneMode(device goadb.Device) error {
-	_, err := d.AdbCommand.DisableAirplaneMode(device)
-	return err
-}
-
 func (d *NetworkServiceImpl) GetAirplaneModeStatus(serial string) (*parser.AirplaneModeStatus, error) {
 	device, err := d.Adb.GetDeviceBySerial(serial)
 	if err != nil {
@@ -78,7 +70,7 @@ func (d *NetworkServiceImpl) GetAirplaneModeStatus(serial string) (*parser.Airpl
 	return <-airplaneModeStatusChain, nil
 }
 
-func (d *NetworkServiceImpl) ToggleAirplaneMode(serial string) (*model.AirplaneModeResponse, error) {
+func (d *NetworkServiceImpl) ToggleAirplaneMode(serial string) (*model.ToggleAirplaneModeResponse, error) {
 	device, err := d.Adb.GetDeviceBySerial(serial)
 	if err != nil {
 		return nil, util.ErrDeviceNotFound
@@ -86,9 +78,9 @@ func (d *NetworkServiceImpl) ToggleAirplaneMode(serial string) (*model.AirplaneM
 	isEnabled := d.getAirplaneModeStatus(*device).Enabled
 	isSuccess := true
 	if isEnabled {
-		err = d.DisableAirplaneMode(*device)
+		_, err = d.AdbCommand.DisableAirplaneMode(*device)
 	} else {
-		err = d.EnableAirplaneMode(*device)
+		_, err = d.AdbCommand.EnableAirplaneMode(*device)
 	}
 	if err == nil {
 		timeout := 10 * time.Second
@@ -111,7 +103,7 @@ func (d *NetworkServiceImpl) ToggleAirplaneMode(serial string) (*model.AirplaneM
 			time.Sleep(1 * time.Second)
 		}
 	}
-	res := model.AirplaneModeResponse{}
+	res := model.ToggleAirplaneModeResponse{}
 	res.Enabled = isEnabled
 	res.Success = isSuccess
 	if err != nil {
@@ -159,4 +151,63 @@ func (d *NetworkServiceImpl) GetNetworkInfo(serial string) (*model.NetworkInfo, 
 	mobileDataIp := <-mobileDataIpChan
 	networkInfo.Ip = mobileDataIp.Ip
 	return &networkInfo, nil
+}
+
+func (d *NetworkServiceImpl) deviceHasMobileDataEnable(device *goadb.Device) bool {
+	rawMobileDataState, _ := d.AdbCommand.GetMobileDataState(*device)
+	for _, data := range strings.Split(strings.TrimSpace(rawMobileDataState), "\n") {
+		mobileDataState := parser.NewMobileDataConnectionState(data)
+		state := mobileDataState.ConnectionState
+		if state == parser.DataConnected || state == parser.DataConnecting {
+			return true
+		}
+	}
+	return false
+}
+func (d *NetworkServiceImpl) ToggleMobileData(serial string) (*model.ToggleMobileDataResponse, error) {
+	device, err := d.Adb.GetDeviceBySerial(serial)
+	if err != nil {
+		return nil, util.ErrDeviceNotFound
+	}
+	isEnabled := d.deviceHasMobileDataEnable(device)
+	isSuccess := false
+	airplaneModeStatusEnabled := d.getAirplaneModeStatus(*device).Enabled
+	if airplaneModeStatusEnabled {
+		err = errors.New("airplane mode is currently active, unable to perform action. Please disable airplane mode first.")
+	} else {
+		if isEnabled {
+			_, err = d.AdbCommand.DisableMobileData(*device)
+		} else {
+			_, err = d.AdbCommand.EnableMobileData(*device)
+		}
+		if err == nil {
+			timeout := 10 * time.Second
+			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			defer cancel()
+		outerLoop:
+			for {
+				if d.deviceHasMobileDataEnable(device) != isEnabled {
+					isEnabled = !isEnabled
+					isSuccess = true
+					break outerLoop
+				}
+				select {
+				case <-ctx.Done():
+					err = errors.New("cannot change mobile data state")
+					isSuccess = false
+					break outerLoop
+				default:
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	}
+
+	res := model.ToggleMobileDataResponse{}
+	res.Enabled = isEnabled
+	res.Success = isSuccess
+	if err != nil {
+		res.Error = err.Error()
+	}
+	return &res, err
 }
