@@ -5,6 +5,8 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type BatteryStatus string
@@ -81,7 +83,10 @@ type batteryData map[string]interface{}
 func NewBattery(rawBattery string) *Battery {
 	battery := &Battery{}
 	data := extractBatteryData(rawBattery)
-	battery.parseBattery(data, battery)
+	err := battery.parseBattery(data, battery)
+	if err != nil {
+		logrus.WithField("location", "NewBattery").Error("error parseBattery: ", err)
+	}
 	return battery
 }
 
