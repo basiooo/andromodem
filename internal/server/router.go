@@ -33,7 +33,7 @@ func (r *routerImpl) Setup() *chi.Mux {
 		appMiddleware.Recoverer,
 	)
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Is main page"))
+		w.Write([]byte("Is main page")) //nolint:errcheck
 	})
 	router.Route("/api", func(r chi.Router) {
 		r.Use(appMiddleware.AdbChecker(adb))
@@ -45,7 +45,7 @@ func (r *routerImpl) Setup() *chi.Mux {
 		networkService := service.NewNetworkService(adb, *adbcommand)
 		networkHandler := handler.NewNetworkHander(networkService)
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("OK"))
+			w.Write([]byte("OK")) //nolint:errcheck
 		})
 		r.Get("/devices", devicesHandler.GetDevices)
 		r.Get("/devices/{serial}", devicesHandler.GetDeviceInfo)

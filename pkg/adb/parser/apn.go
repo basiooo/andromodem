@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Apn struct {
@@ -14,7 +16,10 @@ type Apn struct {
 func NewApn(rawApn string) *Apn {
 	apn := &Apn{}
 	extrackedApn := extractApn(rawApn)
-	parseApn(extrackedApn, apn)
+	err := parseApn(extrackedApn, apn)
+	if err != nil {
+		logrus.WithField("location", "NewApn").Error("error parseApn: ", err)
+	}
 	return apn
 }
 
