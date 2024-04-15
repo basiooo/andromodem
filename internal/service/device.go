@@ -36,6 +36,7 @@ func (d *DeviceServiceImpl) GetDevices() ([]model.Device, error) {
 	for _, device := range deviceList {
 		deviceInfo := d.Adb.Client.Device(goadb.DeviceWithSerial(device.Serial))
 		state, err := deviceInfo.State()
+		device_props := d.GetDeviceProp(*deviceInfo)
 		if err != nil {
 			logrus.WithField("location", "DevicesService.GetDevices").Errorf("GetDevices(): failed get device state %v. error: %v", device.Model, err)
 			state = goadb.StateInvalid
@@ -43,7 +44,7 @@ func (d *DeviceServiceImpl) GetDevices() ([]model.Device, error) {
 		deviceState := adb.DeviceState(state)
 		deviceResponse := model.Device{
 			Serial: device.Serial,
-			Model:  device.Model,
+			Model:  device_props.Model,
 			State:  deviceState.String(),
 		}
 		devices = append(devices, deviceResponse)
