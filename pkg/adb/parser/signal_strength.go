@@ -19,37 +19,38 @@ type SignalStrength struct {
 }
 
 type CellSignalStrengthCdma struct {
+	Level    int    `json:"level,omitempty"`
 	CdmaDbm  string `json:"cdmaDbm,omitempty"`
 	CdmaEcio string `json:"cdmaEcio,omitempty"`
 	EvdoDbm  string `json:"evdoDbm,omitempty"`
 	EvdoEcio string `json:"evdoEcio,omitempty"`
 	EvdoSnr  string `json:"evdoSnr,omitempty"`
-	Level    int    `json:"level,omitempty"`
 }
 
 type CellSignalStrengthGsm struct {
+	Level string `json:"mLevel,omitempty"`
 	Rssi  string `json:"rssi,omitempty"`
 	Ber   string `json:"ber,omitempty"`
 	Ta    string `json:"mTa,omitempty"`
-	Level string `json:"mLevel,omitempty"`
 }
 
 type CellSignalStrengthWcdma struct {
+	Level string `json:"level,omitempty"`
 	Ss    string `json:"ss,omitempty"`
 	Ber   string `json:"ber,omitempty"`
 	Rscp  string `json:"rscp,omitempty"`
 	Ecno  string `json:"ecno,omitempty"`
-	Level string `json:"level,omitempty"`
 }
 
 type CellSignalStrengthTdscdma struct {
+	Level string `json:"level,omitempty"`
 	Rssi  string `json:"rssi,omitempty"`
 	Ber   string `json:"ber,omitempty"`
 	Rscp  string `json:"rscp,omitempty"`
-	Level string `json:"level,omitempty"`
 }
 
 type CellSignalStrengthLte struct {
+	Level                 string `json:"level,omitempty"`
 	Rssi                  string `json:"rssi,omitempty"`
 	Rsrp                  string `json:"rsrp,omitempty"`
 	Rsrq                  string `json:"rsrq,omitempty"`
@@ -57,11 +58,11 @@ type CellSignalStrengthLte struct {
 	CqiTableIndex         string `json:"cqiTableIndex,omitempty"`
 	Cqi                   string `json:"cqi,omitempty"`
 	Ta                    string `json:"ta,omitempty"`
-	Level                 string `json:"level,omitempty"`
 	ParametersUseForLevel string `json:"parametersUseForLevel,omitempty"`
 }
 
 type CellSignalStrengthNr struct {
+	Level                 string   `json:"level,omitempty"`
 	CsiRsrp               string   `json:"csiRsrp,omitempty"`
 	CsiRsrq               string   `json:"csiRsrq,omitempty"`
 	CsiCqiTableIndex      string   `json:"csiCqiTableIndex,omitempty"`
@@ -69,7 +70,6 @@ type CellSignalStrengthNr struct {
 	SsRsrp                string   `json:"ssRsrp,omitempty"`
 	SsRsrq                string   `json:"ssRsrq,omitempty"`
 	SsSinr                string   `json:"ssSinr,omitempty"`
-	Level                 string   `json:"level,omitempty"`
 	ParametersUseForLevel string   `json:"parametersUseForLevel,omitempty"`
 	TimingAdvance         string   `json:"timingAdvance,omitempty"`
 }
