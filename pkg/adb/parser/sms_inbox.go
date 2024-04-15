@@ -10,9 +10,10 @@ import (
 )
 
 type SMSInbox struct {
-	Address string
-	Body    string
-	Date    string
+	Row     string `json:"row"`
+	Address string `json:"address"`
+	Body    string `json:"body"`
+	Date    string `json:"date"`
 }
 
 func NewSMSInbox(rawSmsInbox string) *[]SMSInbox {
@@ -46,17 +47,22 @@ func formatDate(timestamp string) string {
 }
 
 func parseSmsInbox(rawSmsInboxs []string) *[]SMSInbox {
+	reRow := regexp.MustCompile(`Row:([\s\S]*?) address`)
 	reAddress := regexp.MustCompile(`address=([^,]+)`)
 	reBody := regexp.MustCompile(`body=([\s\S]*?), date`)
 	reDate := regexp.MustCompile(`date=(\d+)`)
 	smsInboxs := make([]SMSInbox, 0, len(rawSmsInboxs))
 	for _, input := range rawSmsInboxs {
 		smsInbox := SMSInbox{}
+		row := reRow.FindStringSubmatch(input)
 		address := reAddress.FindStringSubmatch(input)
 		body := reBody.FindStringSubmatch(input)
 		rawDate := reDate.FindStringSubmatch(input)
 		if len(address) == 2 {
 			smsInbox.Address = address[1]
+		}
+		if len(row) == 2 {
+			smsInbox.Row = strings.TrimSpace(row[1])
 		}
 		if len(body) == 2 {
 			smsInbox.Body = body[1]
