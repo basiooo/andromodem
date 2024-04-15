@@ -14,6 +14,6 @@ func StartServer() error {
 		logrus.WithField("location", "StartServer").Error("failed start adb server: ", err)
 	}
 	router := NewRouter(adb)
-	err = http.ListenAndServe(":3001", router.Setup())
+	err = http.ListenAndServe(":3000", router.Setup())
 	return err
 }

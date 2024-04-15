@@ -10,6 +10,7 @@ import (
 	adbcommand "github.com/basiooo/andromodem/pkg/adb/adb_command"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 )
 
 type Router interface {
@@ -31,6 +32,9 @@ func (r *routerImpl) Setup() *chi.Mux {
 		middleware.Logger,
 		middleware.StripSlashes,
 		appMiddleware.Recoverer,
+		cors.Handler(cors.Options{
+			AllowedOrigins: []string{"https://*", "http://*"},
+		}),
 	)
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Is main page")) //nolint:errcheck
