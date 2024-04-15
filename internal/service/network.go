@@ -129,9 +129,15 @@ func (d *NetworkServiceImpl) GetNetworkInfo(serial string) (*model.NetworkInfo, 
 	carriersChan := make(chan []parser.Carrier)
 	apnChan := make(chan *parser.Apn)
 	mobileDataIpChan := make(chan *parser.IpAddress)
+	airplaneModeChan := make(chan *parser.AirplaneModeStatus)
+
 	go func() {
 		defer close(carriersChan)
 		carriersChan <- d.getCarriers(device)
+	}()
+	go func() {
+		defer close(airplaneModeChan)
+		airplaneModeChan <- d.getAirplaneModeStatus(*device)
 	}()
 	go func() {
 		defer close(apnChan)
@@ -141,10 +147,12 @@ func (d *NetworkServiceImpl) GetNetworkInfo(serial string) (*model.NetworkInfo, 
 		defer close(mobileDataIpChan)
 		mobileDataIpChan <- d.getMobileDataIp(*device)
 	}()
+	airplaneMode := <-airplaneModeChan
 	networkInfo.Carriers = <-carriersChan
 	networkInfo.Apn = *<-apnChan
 	mobileDataIp := <-mobileDataIpChan
 	networkInfo.Ip = mobileDataIp.Ip
+	networkInfo.AirplaneMode = airplaneMode.Enabled
 	return &networkInfo, nil
 }
 
