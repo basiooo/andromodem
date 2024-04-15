@@ -45,7 +45,7 @@ func (d *NetworkServiceImpl) getApn(device goadb.Device) *parser.Apn {
 	return apn
 }
 func (d *NetworkServiceImpl) getMobileDataIp(device goadb.Device) *parser.IpAddress {
-	interfaceNames := [2]string{"rmnet_data0", "rmnet_data1"}
+	interfaceNames := [5]string{"rmnet_data0", "rmnet_data1", "rmnet_data2", "rmnet_data3", "rmnet_data4"}
 	for _, v := range interfaceNames {
 		rawApn, _ := d.AdbCommand.GetNetInterface(device, v)
 		ipAddress := parser.NewIpAddress(rawApn)

@@ -10,8 +10,12 @@ type ToggleMobileDataResponse BaseToggleResponse
 
 type NetworkInfo struct {
 	AirplaneMode bool             `json:"airplane_mode"`
-	Apn          parser.Apn       `json:"APN"`
-	Ip           string           `json:"Ip"`
+	Apn          parser.Apn       `json:"apn"`
+	Ip           string           `json:"ip"`
 	Carriers     []parser.Carrier `json:"carriers"`
 	// Wifi         parsers.Wifi     `json:"wifi"`
+}
+
+type NetworkInfoResponse struct {
+	NetworkInfo `json:"network_info"`
 }

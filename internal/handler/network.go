@@ -76,7 +76,9 @@ func (d *NetworkHandlerImpl) GetNetworkInfo(writter http.ResponseWriter, request
 	response := model.BaseResponse{
 		Status:  "Success",
 		Message: "Network information retrieved successfully",
-		Data:    networkInfo,
+		Data: model.NetworkInfoResponse{
+			NetworkInfo: *networkInfo,
+		},
 	}
 	util.WriteToResponseBody(writter, response, http.StatusOK)
 }
