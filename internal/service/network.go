@@ -16,7 +16,7 @@ import (
 
 type NetworkService interface {
 	GetAirplaneModeStatus(string) (*parser.AirplaneModeStatus, error)
-	ToggleAirplaneMode(string) (*model.ToggleAirplaneModeResponse, error)
+	ToggleAirplaneMode(string) (*parser.AirplaneModeStatus, error)
 	GetNetworkInfo(string) (*model.NetworkInfo, error)
 	ToggleMobileData(string) (*model.ToggleMobileDataResponse, error)
 }
@@ -70,13 +70,13 @@ func (d *NetworkServiceImpl) GetAirplaneModeStatus(serial string) (*parser.Airpl
 	return <-airplaneModeStatusChain, nil
 }
 
-func (d *NetworkServiceImpl) ToggleAirplaneMode(serial string) (*model.ToggleAirplaneModeResponse, error) {
+func (d *NetworkServiceImpl) ToggleAirplaneMode(serial string) (*parser.AirplaneModeStatus, error) {
 	device, err := d.Adb.GetDeviceBySerial(serial)
 	if err != nil {
 		return nil, util.ErrDeviceNotFound
 	}
 	isEnabled := d.getAirplaneModeStatus(*device).Enabled
-	result := &model.ToggleAirplaneModeResponse{
+	result := &parser.AirplaneModeStatus{
 		Enabled: isEnabled,
 	}
 	if isEnabled {

@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
+	"runtime"
 
 	"github.com/basiooo/andromodem/internal/adb"
 	"github.com/basiooo/andromodem/internal/model"
@@ -11,6 +13,8 @@ import (
 func AdbChecker(adb *adb.Adb) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(writer http.ResponseWriter, request *http.Request) {
+
+			fmt.Println(runtime.NumGoroutine())
 			if adb.Client == nil {
 				errMessage := "ADB is not installed. Please ensure that ADB is installed on your system before proceeding."
 				if adb.AdbIsInstalled() {

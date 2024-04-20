@@ -23,17 +23,15 @@ func (a *Adb) Start() error {
 		return errors.New("failed create ADB client")
 	}
 
-	err = client.StartServer()
-	if err != nil && client == nil {
-		logrus.Info("Trying start a ADB client manualy")
-		cmd := exec.Command("adb", "start-server")
-		err = cmd.Run()
-		if err != nil {
-			logrus.Errorf("Failed start ADB client manualy: %v", err)
-			return errors.New("failed start ADB client manualy")
-		}
-		logrus.Info("Successfully run ADB client")
+	client.StartServer()
+	logrus.Info("Trying start a ADB client manualy")
+	cmd := exec.Command("adb", "start-server")
+	err = cmd.Run()
+	if err != nil {
+		logrus.Errorf("Failed start ADB client manualy: %v", err)
+		return errors.New("failed start ADB client manualy")
 	}
+	logrus.Info("Successfully run ADB client")
 	a.Client = client
 	return nil
 }

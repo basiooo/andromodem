@@ -44,15 +44,11 @@ func (d *NetworkHandlerImpl) GetAirplaneModeStatus(writter http.ResponseWriter, 
 
 func (d *NetworkHandlerImpl) ToggleAirplaneMode(writter http.ResponseWriter, request *http.Request) {
 	serial := chi.URLParam(request, "serial")
-	airplaneModeStatus, err := d.NetworkService.ToggleAirplaneMode(serial)
+	airplaneMode, err := d.NetworkService.ToggleAirplaneMode(serial)
 	message := "Success disable airplane mode!"
-	if airplaneModeStatus.Enabled {
-		message = "Success enable airplane mode!"
-	}
 	response := model.BaseResponse{
 		Status:  "Success",
 		Message: message,
-		Data:    airplaneModeStatus,
 	}
 	if err != nil {
 		if errors.Is(err, util.ErrDeviceNotFound) {
@@ -63,6 +59,10 @@ func (d *NetworkHandlerImpl) ToggleAirplaneMode(writter http.ResponseWriter, req
 			response.Message = err.Error()
 		}
 	}
+	if airplaneMode.Enabled {
+		message = "Success enable airplane mode!"
+	}
+	response.Data = airplaneMode
 	util.WriteToResponseBody(writter, response, http.StatusOK)
 }
 
@@ -88,9 +88,6 @@ func (d *NetworkHandlerImpl) ToggleMobileData(writter http.ResponseWriter, reque
 	mobileData, err := d.NetworkService.ToggleMobileData(serial)
 
 	message := "Success disable mobile data!"
-	if mobileData.Enabled {
-		message = "Success enable mobile data!"
-	}
 	response := model.BaseResponse{
 		Status:  "Success",
 		Message: message,
@@ -104,6 +101,9 @@ func (d *NetworkHandlerImpl) ToggleMobileData(writter http.ResponseWriter, reque
 			response.Status = "Failed"
 			response.Message = err.Error()
 		}
+	}
+	if mobileData.Enabled {
+		message = "Success enable mobile data!"
 	}
 	util.WriteToResponseBody(writter, response, http.StatusOK)
 }

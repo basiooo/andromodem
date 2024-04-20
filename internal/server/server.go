@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/basiooo/andromodem/internal/adb"
+	"github.com/basiooo/andromodem/templates"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,7 +14,8 @@ func StartServer() error {
 	if err != nil {
 		logrus.WithField("location", "StartServer").Error("failed start adb server: ", err)
 	}
-	router := NewRouter(adb)
-	err = http.ListenAndServe(":3000", router.Setup())
+	mainPage := templates.GetTemplateFS()
+	router := NewRouter(adb, mainPage)
+	err = http.ListenAndServe(":49153", router.Setup())
 	return err
 }

@@ -47,7 +47,9 @@ func (d *DeviceHandlerImpl) GetDeviceInfo(writter http.ResponseWriter, request *
 	response := model.BaseResponse{
 		Status:  "Success",
 		Message: "Device information retrieved successfully",
-		Data:    deviceInfo,
+		Data: model.DeviceInfoResponse{
+			DeviceInfo: *deviceInfo,
+		},
 	}
 	util.WriteToResponseBody(writter, response, http.StatusOK)
 }

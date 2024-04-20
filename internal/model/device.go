@@ -17,3 +17,7 @@ type DeviceInfo struct {
 type DevicesResponse struct {
 	Devices []Device `json:"devices"`
 }
+
+type DeviceInfoResponse struct {
+	DeviceInfo `json:"device_info"`
+}

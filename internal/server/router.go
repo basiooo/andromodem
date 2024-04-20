@@ -1,7 +1,9 @@
 package server
 
 import (
+	"embed"
 	"net/http"
+	"text/template"
 
 	"github.com/basiooo/andromodem/internal/adb"
 	"github.com/basiooo/andromodem/internal/handler"
@@ -11,6 +13,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/sirupsen/logrus"
 )
 
 type Router interface {
@@ -18,11 +21,13 @@ type Router interface {
 }
 type routerImpl struct {
 	*adb.Adb
+	TemplateFs embed.FS
 }
 
-func NewRouter(adb *adb.Adb) Router {
+func NewRouter(adb *adb.Adb, templateFS embed.FS) Router {
 	return &routerImpl{
-		Adb: adb,
+		Adb:        adb,
+		TemplateFs: templateFS,
 	}
 }
 func (r *routerImpl) Setup() *chi.Mux {
@@ -34,10 +39,18 @@ func (r *routerImpl) Setup() *chi.Mux {
 		appMiddleware.Recoverer,
 		cors.Handler(cors.Options{
 			AllowedOrigins: []string{"https://*", "http://*"},
+			AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		}),
 	)
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Is main page")) //nolint:errcheck
+	router.Get("/", func(writer http.ResponseWriter, request *http.Request) {
+		t, err := template.ParseFS(r.TemplateFs, "andromodem-dashboard/dist/index.html")
+		if err != nil {
+			logrus.WithField("function", "NewRouter").Fatal("failed get template : ", err)
+		}
+		err = t.Execute(writer, "")
+		if err != nil {
+			logrus.WithField("function", "NewRouter").Fatal("failed execute template : ", err)
+		}
 	})
 	router.Route("/api", func(r chi.Router) {
 		r.Use(appMiddleware.AdbChecker(adb))
