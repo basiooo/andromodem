@@ -29,7 +29,7 @@ func NewSMSInbox(rawSmsInbox string) (*[]SMSInbox, error) {
 }
 
 func isError(rawSmsInbox string) bool {
-	return strings.Contains(rawSmsInbox, "Error")
+	return strings.Contains(rawSmsInbox, "Error while accessing provider")
 }
 
 func splitSmsinbox(rawSmsInbox string) []string {

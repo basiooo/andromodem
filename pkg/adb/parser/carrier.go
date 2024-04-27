@@ -29,15 +29,18 @@ func parseCarriers(rawCarriers RawCarriers) *[]Carrier {
 		if strings.TrimSpace(carrier) == "" {
 			continue
 		}
-		mobileDataConnectionState := NewMobileDataConnectionState(rawConnectionsState[i])
-		signalStrength := NewSignalStrength(signalsStrength[i])
-
 		simSlot := i + 1
 		carrierData := Carrier{
-			Name:            strings.TrimSpace(carrier),
-			ConnectionState: mobileDataConnectionState.ConnectionState.String(),
-			SimSlot:         int8(simSlot),
-			SignalStrength:  *signalStrength,
+			Name:    strings.TrimSpace(carrier),
+			SimSlot: int8(simSlot),
+		}
+		if len(rawConnectionsState) == len(carriers) {
+			mobileDataConnectionState := NewMobileDataConnectionState(rawConnectionsState[i])
+			carrierData.ConnectionState = mobileDataConnectionState.ConnectionState.String()
+		}
+		if len(signalsStrength) == len(carriers) {
+			signalStrength := NewSignalStrength(signalsStrength[i])
+			carrierData.SignalStrength = *signalStrength
 		}
 		result = append(result, carrierData)
 	}

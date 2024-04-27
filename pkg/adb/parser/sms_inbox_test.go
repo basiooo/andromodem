@@ -28,7 +28,16 @@ func TestParseSmsInbox(t *testing.T) {
 		Body:    "Isi pulsa langsung dapat kuota 24 jam\n\t-5rb,500MB 1hr\n\t-10rb,1GB 1hr\n\t-20rb,1.5GB 2hr\n\t-50rb,3GB 3hr\n\t-100rb,5GB 3hr\n\tDi toko/app favoritmu atau bit.ly/1sipls4",
 		Date:    "2024-04-13 13:47:08",
 	}}
-	smsInboxs := parser.NewSMSInbox(data)
+	smsInboxs, err := parser.NewSMSInbox(data)
 	actual := *smsInboxs
 	assert.Equal(t, expected, actual)
+	assert.Nil(t, err)
+}
+
+func TestParseSmsInboxNotPermission(t *testing.T) {
+	data := `Error while accessing provider:sms
+	java.lang.SecurityException: Permission Denial	
+	`
+	_, err := parser.NewSMSInbox(data)
+	assert.NotNil(t, err)
 }

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"sync"
 
 	goadb "github.com/abccyz/goadb"
@@ -46,7 +45,6 @@ func (d *MessageServiceImpl) GetInbox(serial string) (*model.MessageSMSInbox, er
 	go func() {
 		defer wg.Done()
 		smsInbox.Inboxs, err = d.GetSmsInbox(*device)
-		fmt.Println(err)
 	}()
 	wg.Wait()
 	if err != nil {
