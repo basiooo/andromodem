@@ -1,7 +1,8 @@
 package parser
 
 import (
-	"regexp"
+	"net"
+	"strings"
 )
 
 type IpAddress struct {
@@ -14,10 +15,8 @@ func NewIpAddress(rawIpAddress string) *IpAddress {
 
 func parseIpAddress(rawIpAddress string) *IpAddress {
 	ipAddress := &IpAddress{}
-	re := regexp.MustCompile(`inet addr:(\d+\.\d+\.\d+\.\d+)\s+Mask`)
-	ip := re.FindStringSubmatch(rawIpAddress)
-	if len(ip) > 1 {
-		ipAddress.Ip = ip[1]
+	if net.IP(rawIpAddress) != nil {
+		ipAddress.Ip = strings.TrimSpace(rawIpAddress)
 	}
 	return ipAddress
 }

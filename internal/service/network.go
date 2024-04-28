@@ -46,15 +46,8 @@ func (d *NetworkServiceImpl) getApn(device goadb.Device) *parser.Apn {
 	return apn
 }
 func (d *NetworkServiceImpl) getMobileDataIp(device goadb.Device) *parser.IpAddress {
-	interfaceNames := [12]string{"rmnet_data0", "rmnet_data1", "rmnet_data2", "rmnet_data3", "rmnet_data4", "rmnet_data5", "rmnet0", "rmnet1", "rmnet2", "rmnet3", "rmnet4", "rmnet5"}
-	for _, v := range interfaceNames {
-		rawApn, _ := d.AdbCommand.GetNetInterface(device, v)
-		ipAddress := parser.NewIpAddress(rawApn)
-		if ipAddress.Ip != "" {
-			return ipAddress
-		}
-	}
-	return &parser.IpAddress{}
+	rawMobileDataIp, _ := d.AdbCommand.GetMobileDataIp(device)
+	return parser.NewIpAddress(rawMobileDataIp)
 }
 
 func (d *NetworkServiceImpl) GetAirplaneModeStatus(serial string) (*parser.AirplaneModeStatus, error) {

@@ -111,6 +111,15 @@ func (a *AdbCommand) GetApn(device goadb.Device) (string, error) {
 	return apn, nil
 }
 
+func (a *AdbCommand) GetMobileDataIp(device goadb.Device) (string, error) {
+	mobileDataIp, err := device.RunCommand("ip route | grep 'rmnet.*src' | awk '{print $NF}'")
+	if err != nil {
+		logrus.WithField("location", "AdbCommand.GetMobileDataIp").Errorf("GetMobileDataIp(): failed get mobile data ip: %v", err)
+		return "", err
+	}
+	return mobileDataIp, nil
+}
+
 func (a *AdbCommand) GetNetInterface(device goadb.Device, interfaceName string) (string, error) {
 	interfaceData, err := device.RunCommand("ifconfig " + interfaceName)
 	if err != nil {
