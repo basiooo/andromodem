@@ -27,6 +27,9 @@ func isRooted(rawRoot string) bool {
 
 func parseRootDetail(rawRoot string) *RootDetail {
 	rootDetail := strings.Split(strings.TrimSpace(rawRoot), ":")
+	if len(rootDetail) != 2 {
+		rootDetail = strings.Split(strings.TrimSpace(rawRoot), " ")
+	}
 	if len(rootDetail) == 2 {
 		return &RootDetail{
 			Version: rootDetail[0],
