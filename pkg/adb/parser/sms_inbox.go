@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"errors"
 	"regexp"
 	"strconv"
 	"strings"
@@ -16,10 +17,19 @@ type SMSInbox struct {
 	Date    string `json:"date"`
 }
 
-func NewSMSInbox(rawSmsInbox string) *[]SMSInbox {
+func NewSMSInbox(rawSmsInbox string) (*[]SMSInbox, error) {
 	splitSms := splitSmsinbox(rawSmsInbox)
 	smsInboxs := parseSmsInbox(splitSms)
-	return smsInboxs
+	if len(*smsInboxs) == 0 {
+		if isError(rawSmsInbox) {
+			return nil, errors.New("cannot get sms list")
+		}
+	}
+	return smsInboxs, nil
+}
+
+func isError(rawSmsInbox string) bool {
+	return strings.Contains(rawSmsInbox, "Error while accessing provider")
 }
 
 func splitSmsinbox(rawSmsInbox string) []string {

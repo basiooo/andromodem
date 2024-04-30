@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"sync"
 	"time"
 
 	goadb "github.com/abccyz/goadb"
@@ -45,15 +46,8 @@ func (d *NetworkServiceImpl) getApn(device goadb.Device) *parser.Apn {
 	return apn
 }
 func (d *NetworkServiceImpl) getMobileDataIp(device goadb.Device) *parser.IpAddress {
-	interfaceNames := [5]string{"rmnet_data0", "rmnet_data1", "rmnet_data2", "rmnet_data3", "rmnet_data4"}
-	for _, v := range interfaceNames {
-		rawApn, _ := d.AdbCommand.GetNetInterface(device, v)
-		ipAddress := parser.NewIpAddress(rawApn)
-		if ipAddress.Ip != "" {
-			return ipAddress
-		}
-	}
-	return &parser.IpAddress{}
+	rawMobileDataIp, _ := d.AdbCommand.GetMobileDataIp(device)
+	return parser.NewIpAddress(rawMobileDataIp)
 }
 
 func (d *NetworkServiceImpl) GetAirplaneModeStatus(serial string) (*parser.AirplaneModeStatus, error) {
@@ -108,14 +102,25 @@ func (d *NetworkServiceImpl) ToggleAirplaneMode(serial string) (*parser.Airplane
 }
 
 func (d *NetworkServiceImpl) getCarriers(device *goadb.Device) []parser.Carrier {
-	rawConnectionsState, _ := d.AdbCommand.GetMobileDataState(*device)
-	rawCarriersName, _ := d.AdbCommand.GetCarriersName(*device)
-	rawSignalsStrength, _ := d.AdbCommand.GetSignalStrength(*device)
-	rawCarriers := parser.RawCarriers{
-		RawConnectionsState: rawConnectionsState,
-		RawCarriersName:     rawCarriersName,
-		RawSignalsStrength:  rawSignalsStrength,
-	}
+	var rawCarriers parser.RawCarriers
+	var wg sync.WaitGroup
+	wg.Add(3)
+	go func() {
+		defer wg.Done()
+		rawConnectionsState, _ := d.AdbCommand.GetMobileDataState(*device)
+		rawCarriers.RawConnectionsState = rawConnectionsState
+	}()
+	go func() {
+		defer wg.Done()
+		rawCarriersName, _ := d.AdbCommand.GetCarriersName(*device)
+		rawCarriers.RawCarriersName = rawCarriersName
+	}()
+	go func() {
+		defer wg.Done()
+		rawSignalsStrength, _ := d.AdbCommand.GetSignalStrength(*device)
+		rawCarriers.RawSignalsStrength = rawSignalsStrength
+	}()
+	wg.Wait()
 	carriersInfo := parser.NewCarriers(rawCarriers)
 	return *carriersInfo
 }
@@ -125,35 +130,31 @@ func (d *NetworkServiceImpl) GetNetworkInfo(serial string) (*model.NetworkInfo, 
 	if err != nil {
 		return nil, util.ErrDeviceNotFound
 	}
-	networkInfo := model.NetworkInfo{}
-	carriersChan := make(chan []parser.Carrier)
-	apnChan := make(chan *parser.Apn)
-	mobileDataIpChan := make(chan *parser.IpAddress)
-	airplaneModeChan := make(chan *parser.AirplaneModeStatus)
+	var networkInfo model.NetworkInfo
+	var wg sync.WaitGroup
+	wg.Add(4)
+	go func() {
+		defer wg.Done()
+		networkInfo.Carriers = d.getCarriers(device)
+	}()
+	go func() {
+		defer wg.Done()
+		networkInfo.AirplaneMode = d.getAirplaneModeStatus(*device).Enabled
+	}()
+	go func() {
+		defer wg.Done()
+		networkInfo.Apn = d.getApn(*device)
+	}()
+	go func() {
+		defer wg.Done()
+		ipInfo := d.getMobileDataIp(*device)
+		networkInfo.Ip = ipInfo.Ip
+	}()
 
-	go func() {
-		defer close(carriersChan)
-		carriersChan <- d.getCarriers(device)
-	}()
-	go func() {
-		defer close(airplaneModeChan)
-		airplaneModeChan <- d.getAirplaneModeStatus(*device)
-	}()
-	go func() {
-		defer close(apnChan)
-		apnChan <- d.getApn(*device)
-	}()
-	go func() {
-		defer close(mobileDataIpChan)
-		mobileDataIpChan <- d.getMobileDataIp(*device)
-	}()
-	airplaneMode := <-airplaneModeChan
-	networkInfo.Carriers = <-carriersChan
-	networkInfo.Apn = *<-apnChan
-	mobileDataIp := <-mobileDataIpChan
-	networkInfo.Ip = mobileDataIp.Ip
-	networkInfo.AirplaneMode = airplaneMode.Enabled
+	wg.Wait()
+
 	return &networkInfo, nil
+
 }
 
 func (d *NetworkServiceImpl) deviceHasMobileDataEnable(device *goadb.Device) bool {

@@ -27,14 +27,20 @@ func NewMessageHander(deviceService service.MessageService) MessageHandler {
 func (d *MessageHandlerImpl) GetSmsInbox(writter http.ResponseWriter, request *http.Request) {
 	serial := chi.URLParam(request, "serial")
 	smsInbox, err := d.MessageService.GetInbox(serial)
-	if err != nil && errors.Is(err, util.ErrDeviceNotFound) {
-		util.MakeDeviceNotFoundResponse(writter)
-		return
-	}
 	response := model.BaseResponse{
 		Status:  "Success",
-		Message: "Inbox SMS list retrieved successfully",
-		Data:    smsInbox,
+		Message: "SMS list retrieved successfully",
 	}
-	util.WriteToResponseBody(writter, response, http.StatusOK)
+	statusCode := http.StatusOK
+	if err != nil {
+		if errors.Is(err, util.ErrDeviceNotFound) {
+			util.MakeDeviceNotFoundResponse(writter)
+			return
+		}
+		response.Status = "Failed"
+		response.Message = err.Error()
+		statusCode = http.StatusInternalServerError
+	}
+	response.Data = smsInbox
+	util.WriteToResponseBody(writter, response, statusCode)
 }
