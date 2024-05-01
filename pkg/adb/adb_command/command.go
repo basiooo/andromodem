@@ -48,6 +48,15 @@ func (a *AdbCommand) GetSmsInbox(device goadb.Device) (string, error) {
 	return inbox, nil
 }
 
+func (a *AdbCommand) GetSmsInboxRoot(device goadb.Device) (string, error) {
+	inbox, err := device.RunCommand("su -c 'content query --uri content://sms/inbox --projection address,body,date'")
+	if err != nil {
+		logrus.WithField("location", "AdbDeviceCommand.GetSmsInboxRoot").Errorf("GetSmsInboxRoot(): failed get sms inbox with root method: %v", err)
+		return "", err
+	}
+	return inbox, nil
+}
+
 func (a *AdbCommand) GetAirplaneModeStatus(device goadb.Device) (string, error) {
 	airplaneModeStatus, err := device.RunCommand("cmd connectivity airplane-mode")
 	if err != nil {

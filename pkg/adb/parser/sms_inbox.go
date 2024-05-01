@@ -21,15 +21,23 @@ func NewSMSInbox(rawSmsInbox string) (*[]SMSInbox, error) {
 	splitSms := splitSmsinbox(rawSmsInbox)
 	smsInboxs := parseSmsInbox(splitSms)
 	if len(*smsInboxs) == 0 {
-		if isError(rawSmsInbox) {
-			return nil, errors.New("cannot get sms list")
+		if isErrorReqRootDevice(rawSmsInbox) {
+			return nil, errors.New("cannot get sms list without root")
+		}
+
+		if isErrorReqRootPermission(rawSmsInbox) {
+			return nil, errors.New("cannot get sms list. please allow root permission")
 		}
 	}
 	return smsInboxs, nil
 }
 
-func isError(rawSmsInbox string) bool {
+func isErrorReqRootDevice(rawSmsInbox string) bool {
 	return strings.Contains(rawSmsInbox, "Error while accessing provider")
+}
+
+func isErrorReqRootPermission(rawSmsInbox string) bool {
+	return strings.Contains(rawSmsInbox, "Permission denied")
 }
 
 func splitSmsinbox(rawSmsInbox string) []string {

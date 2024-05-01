@@ -45,6 +45,7 @@ func (d *NetworkServiceImpl) getApn(device goadb.Device) *parser.Apn {
 	apn := parser.NewApn(rawApn)
 	return apn
 }
+
 func (d *NetworkServiceImpl) getMobileDataIp(device goadb.Device) *parser.IpAddress {
 	rawMobileDataIp, _ := d.AdbCommand.GetMobileDataIp(device)
 	return parser.NewIpAddress(rawMobileDataIp)
