@@ -33,11 +33,11 @@ func NewSMSInbox(rawSmsInbox string) (*[]SMSInbox, error) {
 }
 
 func isErrorReqRootDevice(rawSmsInbox string) bool {
-	return strings.Contains(rawSmsInbox, "Error while accessing provider")
+	return strings.Contains(strings.ToLower(rawSmsInbox), "error while accessing provider")
 }
 
 func isErrorReqRootPermission(rawSmsInbox string) bool {
-	return strings.Contains(rawSmsInbox, "Permission denied")
+	return strings.Contains(strings.ToLower(rawSmsInbox), "permission denied")
 }
 
 func splitSmsinbox(rawSmsInbox string) []string {
