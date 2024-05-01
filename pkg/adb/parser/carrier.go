@@ -29,8 +29,20 @@ func parseCarriers(rawCarriers RawCarriers) *[]Carrier {
 		if strings.TrimSpace(carrier) == "" {
 			continue
 		}
-		mobileDataConnectionState := NewMobileDataConnectionState(rawConnectionsState[i])
-		signalStrength := NewSignalStrength(signalsStrength[i])
+		var mobileDataConnectionState *MobileDataConnectionState
+		var signalStrength *SignalStrength
+		if i+1 > len(rawConnectionsState) {
+			mobileDataConnectionState = &MobileDataConnectionState{
+				ConnectionState: DataUnknown,
+			}
+		} else {
+			mobileDataConnectionState = NewMobileDataConnectionState(rawConnectionsState[i])
+		}
+		if i+1 > len(rawConnectionsState) {
+			signalStrength = &SignalStrength{}
+		} else {
+			signalStrength = NewSignalStrength(signalsStrength[i])
+		}
 
 		simSlot := i + 1
 		carrierData := Carrier{
