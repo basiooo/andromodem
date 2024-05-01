@@ -20,20 +20,24 @@ type SMSInbox struct {
 func NewSMSInbox(rawSmsInbox string) (*[]SMSInbox, error) {
 	splitSms := splitSmsinbox(rawSmsInbox)
 	smsInboxs := parseSmsInbox(splitSms)
-	if len(*smsInboxs) == 0 {
-		if isErrorReqRootDevice(rawSmsInbox) {
-			return nil, errors.New("cannot get sms list without root")
-		}
-
+	if len(*smsInboxs) == 0 && !isEmptySMS(rawSmsInbox) {
 		if isErrorReqRootPermission(rawSmsInbox) {
 			return nil, errors.New("cannot get sms list. please allow root permission")
+		}
+
+		if isErrorReqRootDevice(rawSmsInbox) {
+			return nil, errors.New("cannot get sms list without root")
 		}
 	}
 	return smsInboxs, nil
 }
 
 func isErrorReqRootDevice(rawSmsInbox string) bool {
-	return strings.Contains(strings.ToLower(rawSmsInbox), "error while accessing provider")
+	return strings.Contains(strings.ToLower(rawSmsInbox), "error while accessing provider") || !strings.Contains(rawSmsInbox, "Row: ")
+}
+
+func isEmptySMS(rawSmsInbox string) bool {
+	return strings.TrimSpace(strings.ToLower(rawSmsInbox)) == "no result found."
 }
 
 func isErrorReqRootPermission(rawSmsInbox string) bool {
