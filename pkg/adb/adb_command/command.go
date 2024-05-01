@@ -121,7 +121,7 @@ func (a *AdbCommand) GetApn(device goadb.Device) (string, error) {
 }
 
 func (a *AdbCommand) GetMobileDataIp(device goadb.Device) (string, error) {
-	mobileDataIp, err := device.RunCommand("ip route | grep 'rmnet.*src' | awk '{print $NF}'")
+	mobileDataIp, err := device.RunCommand(`ip route | grep 'rmnet.*src' | sed -E 's/.*src ([^ ]+).*/\1/'`)
 	if err != nil {
 		logrus.WithField("location", "AdbCommand.GetMobileDataIp").Errorf("GetMobileDataIp(): failed get mobile data ip: %v", err)
 		return "", err
