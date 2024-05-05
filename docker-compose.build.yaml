@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  andromodem:
+    build:
+      context: .
+      dockerfile: Dockerfile.build
+    volumes:
+      - .:/andromodem
+      - /andromodem/templates/andromodem-dashboard/node_modules
+    command: >
+      sh -c "npm --prefix ./templates/andromodem-dashboard/ install &&
+             npm --prefix ./templates/andromodem-dashboard/ run build &&
+             go mod download &&
+             ./build.sh"

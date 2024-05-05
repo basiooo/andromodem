@@ -1,0 +1,11 @@
+FROM openwrt/rootfs:latest
+
+USER root
+
+RUN mkdir /var/lock && opkg update && opkg install node && opkg install node-npm && opkg install golang && opkg install bash
+
+COPY . ./andromodem
+WORKDIR /andromodem
+
+
+
