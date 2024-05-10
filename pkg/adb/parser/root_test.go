@@ -20,6 +20,19 @@ func TestParseRoot(t *testing.T) {
 	actual := *rootInfo
 	assert.Equal(t, expected, actual)
 }
+func TestParseRootOldVersion(t *testing.T) {
+	data := "16 superuser"
+	expected := parser.Root{
+		IsRooted: true,
+		RootDetail: &parser.RootDetail{
+			Version: "16",
+			Name:    "superuser",
+		},
+	}
+	rootInfo := parser.NewRoot(data)
+	actual := *rootInfo
+	assert.Equal(t, expected, actual)
+}
 func TestParseRootNotRooted(t *testing.T) {
 	data := "/system/bin/sh: su: not found"
 	expected := parser.Root{

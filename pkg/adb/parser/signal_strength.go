@@ -18,6 +18,10 @@ type SignalStrength struct {
 	*CellSignalStrengthNr      `json:"Nr,omitempty"`
 }
 
+func (ss *SignalStrength) IsEmpty() bool {
+	return ss.CellSignalStrengthCdma == nil && ss.CellSignalStrengthGsm == nil && ss.CellSignalStrengthWcdma == nil && ss.CellSignalStrengthTdscdma == nil && ss.CellSignalStrengthLte == nil && ss.CellSignalStrengthNr == nil
+}
+
 type CellSignalStrengthCdma struct {
 	Level    int    `json:"level,omitempty"`
 	CdmaDbm  string `json:"cdmaDbm,omitempty"`
@@ -75,7 +79,45 @@ type CellSignalStrengthNr struct {
 }
 
 func NewSignalStrength(rawsignalStrength string) *SignalStrength {
-	return parseSignalStrength(rawsignalStrength)
+	signalStrength := parseSignalStrength(rawsignalStrength)
+	if signalStrength.IsEmpty() {
+		signalStrength = parseSignalStrengthOld(rawsignalStrength)
+	}
+	return signalStrength
+}
+
+func parseSignalStrengthOld(rawsignalStrength string) *SignalStrength {
+	var networkType string
+	regexNetworkType := regexp.MustCompile(`\s\w+\|\w+`)
+	signalStrength := &SignalStrength{}
+	match := regexNetworkType.FindString(rawsignalStrength)
+	networkTypes := strings.Split(match, "|")
+	if len(networkTypes) == 1 {
+		networkType = networkTypes[0]
+	} else if len(networkTypes) == 2 {
+		networkType = networkTypes[1]
+	} else {
+		return signalStrength
+	}
+	networkType = strings.TrimSpace(networkType)
+	networkType = strings.ToLower(networkType)
+	switch networkType {
+	case "cdma":
+		signalStrength.CellSignalStrengthCdma = &CellSignalStrengthCdma{}
+	case "gsm":
+		signalStrength.CellSignalStrengthGsm = &CellSignalStrengthGsm{}
+	case "wcdma":
+		signalStrength.CellSignalStrengthWcdma = &CellSignalStrengthWcdma{}
+	case "tdscdma":
+		signalStrength.CellSignalStrengthTdscdma = &CellSignalStrengthTdscdma{}
+	case "lte":
+		signalStrength.CellSignalStrengthLte = &CellSignalStrengthLte{}
+	case "nr":
+		signalStrength.CellSignalStrengthNr = &CellSignalStrengthNr{}
+	default:
+
+	}
+	return signalStrength
 }
 
 func parseSignalStrength(rawsignalStrength string) *SignalStrength {

@@ -48,6 +48,15 @@ func (a *AdbCommand) GetSmsInbox(device goadb.Device) (string, error) {
 	return inbox, nil
 }
 
+func (a *AdbCommand) GetSmsInboxRoot(device goadb.Device) (string, error) {
+	inbox, err := device.RunCommand("su -c 'content query --uri content://sms/inbox --projection address,body,date'")
+	if err != nil {
+		logrus.WithField("location", "AdbDeviceCommand.GetSmsInboxRoot").Errorf("GetSmsInboxRoot(): failed get sms inbox with root method: %v", err)
+		return "", err
+	}
+	return inbox, nil
+}
+
 func (a *AdbCommand) GetAirplaneModeStatus(device goadb.Device) (string, error) {
 	airplaneModeStatus, err := device.RunCommand("cmd connectivity airplane-mode")
 	if err != nil {
@@ -112,7 +121,7 @@ func (a *AdbCommand) GetApn(device goadb.Device) (string, error) {
 }
 
 func (a *AdbCommand) GetMobileDataIp(device goadb.Device) (string, error) {
-	mobileDataIp, err := device.RunCommand("ip route | grep 'rmnet.*src' | awk '{print $NF}'")
+	mobileDataIp, err := device.RunCommand(`ip route | grep 'rmnet.*src' | sed -E 's/.*src ([^ ]+).*/\1/'`)
 	if err != nil {
 		logrus.WithField("location", "AdbCommand.GetMobileDataIp").Errorf("GetMobileDataIp(): failed get mobile data ip: %v", err)
 		return "", err

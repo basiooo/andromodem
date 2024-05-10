@@ -26,14 +26,21 @@ func NewMessageService(adb *adb.Adb, adbCommand adbcommand.AdbCommand) MessageSe
 		AdbCommand: adbCommand,
 	}
 }
-func (d *MessageServiceImpl) GetSmsInbox(device goadb.Device) (*[]parser.SMSInbox, error) {
-	rawSmsInbox, _ := d.AdbCommand.GetSmsInbox(device)
 
+func (d *MessageServiceImpl) GetSmsInbox(device goadb.Device) (*[]parser.SMSInbox, string, error) {
+	rawSmsInbox, _ := d.AdbCommand.GetSmsInbox(device)
 	smsInboxs, err := parser.NewSMSInbox(rawSmsInbox)
-	return smsInboxs, err
+	method := "without root"
+	if err != nil {
+		rawSmsInbox, _ := d.AdbCommand.GetSmsInboxRoot(device)
+		smsInboxs, err = parser.NewSMSInbox(rawSmsInbox)
+		method = "root"
+	}
+	return smsInboxs, method, err
 }
 
 func (d *MessageServiceImpl) GetInbox(serial string) (*model.MessageSMSInbox, error) {
+	var err error
 	device, err := d.Adb.GetDeviceBySerial(serial)
 	if err != nil {
 		return nil, util.ErrDeviceNotFound
@@ -44,7 +51,12 @@ func (d *MessageServiceImpl) GetInbox(serial string) (*model.MessageSMSInbox, er
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		smsInbox.Inboxs, err = d.GetSmsInbox(*device)
+		inboxs, method, e := d.GetSmsInbox(*device)
+		err = e
+		if err == nil {
+			smsInbox.Inboxs = inboxs
+			smsInbox.Method = &method
+		}
 	}()
 	wg.Wait()
 	if err != nil {
