@@ -41,7 +41,7 @@ func isEmptySMS(rawSmsInbox string) bool {
 }
 
 func isErrorReqRootPermission(rawSmsInbox string) bool {
-	return strings.Contains(strings.ToLower(rawSmsInbox), "permission denied")
+	return strings.Contains(strings.ToLower(rawSmsInbox), "permission")
 }
 
 func splitSmsinbox(rawSmsInbox string) []string {
