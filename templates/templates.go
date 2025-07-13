@@ -1,10 +1,15 @@
+// Package templates provides functionality to embed and serve frontend assets
+// (React JS build) directly from the Go application's filesystem.
 package templates
 
-import "embed"
+import (
+	"embed"
+	"io/fs"
+)
 
-//go:embed andromodem-dashboard/dist/*
-var mainPage embed.FS
+//go:embed andromodem_fe/dist/*
+var MainPage embed.FS
 
-func GetTemplateFS() embed.FS {
-	return mainPage
+func GetTemplateFS() fs.FS {
+	return MainPage
 }

@@ -1,7 +1,8 @@
 package model
 
 type BaseResponse struct {
-	Status  string      `json:"status"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Success bool              `json:"success"`
+	Message string            `json:"message"`
+	Data    any               `json:"data,omitempty"`
+	Errors  map[string]string `json:"errors,omitempty"`
 }
