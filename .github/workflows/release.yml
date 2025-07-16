@@ -27,7 +27,7 @@ jobs:
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Version: $VERSION"
 
-    - name: Build frontend (outside container)
+    - name: Build frontend
       run: |
         cd templates/andromodem_fe
         npm install
