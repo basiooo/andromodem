@@ -8,6 +8,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/basiooo/andromodem)
 ![Go Version](https://img.shields.io/github/go-mod/go-version/basiooo/andromodem)
 ![License](https://img.shields.io/github/license/basiooo/andromodem)
+![Static Badge](https://img.shields.io/badge/saweria-donation?style=for-the-badge&color=%23faae2b&link=https%3A%2F%2Fsaweria.co%2Fbasiooo)
 
 **Android device management system with monitoring and automation capabilities**
 
@@ -191,6 +192,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 🐛 **Bug Reports**: [GitHub Issues](https://github.com/basiooo/andromodem/issues)
 - 💡 **Feature Requests**: [GitHub Discussions](https://github.com/basiooo/andromodem/discussions)
 - 📧 **Contact**: [Bagas Julianto](https://github.com/basiooo)
+
+## 💸 Donation
+
+- [Saweria](https://saweria.co/basiooo)
 
 ---
 

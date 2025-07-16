@@ -1,5 +1,5 @@
 import type { FC } from "react"
-import {FaFacebook, FaGithub, FaHeart, FaInstagram} from "react-icons/fa"
+import {FaDonate, FaFacebook, FaGithub, FaHeart, FaInstagram} from "react-icons/fa"
 import {FaEarthAsia} from "react-icons/fa6"
 
 import {config} from "@/config"
@@ -25,6 +25,8 @@ const Footer: FC = () => {
                     className="grid-flow-col gap-4 md:place-self-center md:justify-self-end mx-auto md:mx-0 mt-5 md:mt-0">
                     <a className="link" target="_blank" rel="noreferrer" href="https://github.com/basiooo/andromodem">
                         <FaGithub className="inline mx-1 text-2xl"/></a>
+                    <a className="link" target="_blank" rel="noreferrer" href="https://saweria.co/basiooo">
+                        <FaDonate className="inline mx-1 text-2xl"/></a>
                     <a className="link" target="_blank" rel="noreferrer" href="https://bagasjulianto.my.id">
                         <FaEarthAsia className="inline mx-1 text-2xl"/></a>
                     <a className="link" target="_blank" rel="noreferrer" href="https://www.facebook.com/bagas.jul.33">
