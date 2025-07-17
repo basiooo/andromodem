@@ -27,7 +27,9 @@ get_os_arch() {
 }
 
 get_latest_version() {
-    curl -sI "${GITHUB_REPO}/releases/latest" | grep -i ^location | sed 's|.*/tag/v||' | tr -d '\r'
+    wget --server-response --spider "${GITHUB_REPO}/releases/latest" 2>&1 \
+        | awk '/^  Location: /{gsub(/\r/, "", $2); print $2}' \
+        | sed 's|.*/tag/v||'
 }
 
 get_local_version() {
@@ -48,7 +50,7 @@ get_local_version() {
 install_dependencies() {
     echo "📦 Updating package index and installing dependencies..."
     opkg update
-    opkg install adb wget curl
+    opkg install adb wget
 }
 
 download_binary() {
@@ -57,7 +59,7 @@ download_binary() {
     api_url="https://api.github.com/repos/basiooo/andromodem/releases/tags/v${version}"
 
     echo "🔍 Checking release assets via GitHub API..."
-    asset_url=$(curl -s "$api_url" | grep "browser_download_url" | grep "$os_arch" | cut -d '"' -f 4)
+    asset_url=$(wget -qO- "$api_url" | grep "browser_download_url" | grep "$os_arch" | cut -d '"' -f 4)
 
     if [ -z "$asset_url" ]; then
         echo "❌ No asset found for architecture $os_arch in version v$version."
@@ -65,7 +67,7 @@ download_binary() {
     fi
 
     echo "⬇️  Downloading binary from: $asset_url"
-    if curl -L -o "$BIN_PATH" "$asset_url"; then
+    if wget -O "$BIN_PATH" "$asset_url"; then
         chmod +x "$BIN_PATH"
     else
         echo "❌ Failed to download binary."
@@ -198,8 +200,12 @@ case "$1" in
     uninstall)
         uninstall_andromodem
         ;;
+    reinstall)
+        uninstall_andromodem
+        install_andromodem
+        ;;
     *)
-        echo "Usage: $0 {install|update|uninstall}"
+        echo "Usage: $0 {install|update|uninstall|reinstall}"
         exit 1
         ;;
 esac
