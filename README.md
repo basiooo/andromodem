@@ -94,16 +94,34 @@ go build -o andromodem cmd/andromodem/main.go
 ```
 
 #### Option 3: OpenWrt Installation
-```bash
-# One-line installation on OpenWrt
-bash <(wget -qO- https://raw.githubusercontent.com/basiooo/andromodem/main/andromodem_openwrt.sh)
+
+AndroModem supports direct installation on **OpenWrt-based routers**, with support for `install`, `update`, `reinstall`, and `uninstall` via a single command.
+
+##### ⚙️ Available Commands
+
+Run the desired command on your OpenWrt terminal:
+
+###### 🔹 Install
+```sh
+wget -O - https://raw.githubusercontent.com/basiooo/andromodem/main/andromodem_openwrt.sh | sh -s install
 ```
 
-#### Option 4: OpenWrt Installation (if your shell not support substitution process like ash)
-```bash
-# One-line installation on OpenWrt
-wget -qO- https://raw.githubusercontent.com/basiooo/andromodem/main/andromodem_openwrt.sh | sh -s reinstall
+###### 🔹 Update
+```sh
+wget -O - https://raw.githubusercontent.com/basiooo/andromodem/main/andromodem_openwrt.sh | sh -s update
 ```
+
+###### 🔹 Reinstall
+```sh
+wget -O - https://raw.githubusercontent.com/basiooo/andromodem/main/andromodem_openwrt.sh | sh -s reinstall
+```
+
+###### 🔹 Uninstall
+```sh
+wget -O - https://raw.githubusercontent.com/basiooo/andromodem/main/andromodem_openwrt.sh | sh -s uninstall
+```
+>💡 These commands are fully compatible with ash and other lightweight shells used in OpenWrt.
+
 ---
 
 ## 🎮 Usage
