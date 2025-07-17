@@ -190,22 +190,48 @@ uninstall_andromodem() {
     echo "✅ $APP_NAME uninstalled."
 }
 
-case "$1" in
-    install)
-        install_andromodem
-        ;;
-    update)
-        update_andromodem
-        ;;
-    uninstall)
-        uninstall_andromodem
-        ;;
-    reinstall)
-        uninstall_andromodem
-        install_andromodem
-        ;;
-    *)
-        echo "Usage: $0 {install|update|uninstall|reinstall}"
-        exit 1
-        ;;
-esac
+show_menu() {
+    echo ""
+    echo "📦 AndroModem OpenWRT Installer Menu"
+    echo "============================"
+    echo "1) Install"
+    echo "2) Update"
+    echo "3) Uninstall"
+    echo "4) Reinstall"
+    echo "5) Exit"
+    echo ""
+
+    read -p "Please select an option [1-5]: " choice
+    case "$choice" in
+        1) install_andromodem ;;
+        2) update_andromodem ;;
+        3) uninstall_andromodem ;;
+        4) uninstall_andromodem; install_andromodem ;;
+        5) echo "👋 Exiting..."; exit 0 ;;
+        *) echo "❌ Invalid choice."; exit 1 ;;
+    esac
+}
+
+if [ -z "$1" ]; then
+    show_menu
+else
+    case "$1" in
+        install)
+            install_andromodem
+            ;;
+        update)
+            update_andromodem
+            ;;
+        uninstall)
+            uninstall_andromodem
+            ;;
+        reinstall)
+            uninstall_andromodem
+            install_andromodem
+            ;;
+        *)
+            echo "Usage: $0 {install|update|uninstall|reinstall}"
+            exit 1
+            ;;
+    esac
+fi
