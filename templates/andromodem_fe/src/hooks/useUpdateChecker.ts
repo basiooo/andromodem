@@ -28,17 +28,11 @@ const useUpdateChecker = () => {
     const cleanCurrent = current.replace(/^v/, "")
     const cleanLatest = latest.replace(/^v/, "")
     
-    // Add debug logging
-    console.log('Version comparison:', { current: cleanCurrent, latest: cleanLatest })
-    
     if (cleanCurrent === "unknown") {
-      console.log('Current version is unknown, showing update')
       return true
     }
     
-    // Handle exact match first
     if (cleanCurrent === cleanLatest) {
-      console.log('Versions are identical, no update needed')
       return false
     }
     

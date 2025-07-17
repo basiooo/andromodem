@@ -8,12 +8,17 @@ import Header from "@/components/Header/Header"
 import UpdateModal from "@/components/Modal/UpdateModal"
 import useUpdateChecker from "@/hooks/useUpdateChecker"
 import { useUpdateStore } from "@/stores/updateStore"
+import useHealthCheck from "@/hooks/useHealthCheck"
 
 const MainLayout: FC = () => {
   const { updateInfo: checkerUpdateInfo } = useUpdateChecker()
   const { updateInfo, setUpdateInfo } = useUpdateStore()
+  const {error: healthError } = useHealthCheck()
+  
+  if (healthError) {
+    throw healthError
+  }
 
-  // Sync update info from checker to store
   useEffect(() => {
     if (checkerUpdateInfo) {
       setUpdateInfo(checkerUpdateInfo)
