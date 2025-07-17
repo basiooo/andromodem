@@ -6,9 +6,9 @@ import DeviceSelector from "@/components/DeviceSelector/DeviceSelector"
 import Footer from "@/components/Footer/Footer"
 import Header from "@/components/Header/Header"
 import UpdateModal from "@/components/Modal/UpdateModal"
+import useHealthCheck from "@/hooks/useHealthCheck"
 import useUpdateChecker from "@/hooks/useUpdateChecker"
 import { useUpdateStore } from "@/stores/updateStore"
-import useHealthCheck from "@/hooks/useHealthCheck"
 
 const MainLayout: FC = () => {
   const { updateInfo: checkerUpdateInfo } = useUpdateChecker()

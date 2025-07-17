@@ -13,18 +13,17 @@ import { MdOutlineFactory } from "react-icons/md"
 import { PiIdentificationBadgeBold } from "react-icons/pi"
 import {TbBatteryVerticalOff} from "react-icons/tb"
 
-import useDeviceInfo from "@/hooks/useDeviceInfo"
-import { type Device, DeviceState } from "@/types/device"
-import { convertStorageUnit, getPercentage, secondsForHuman } from "@/utils/converter"
-
+import DeviceInfoCard from "@/components/DeviceInfo/DeviceInfoCard"
+import DeviceInfoItem from "@/components/DeviceInfo/DeviceInfoItem"
 import LoadingOverlay from "@/components/Loading/LoadingOverlay"
 import ModalBattery from "@/components/Modal/BatteryModal"
 import ModalMemory from "@/components/Modal/MemoryModal"
 import ModalStorage from "@/components/Modal/StorageModal"
 import DeviceInfoCardSkeleton from "@/components/Skeleton/DeviceInfoCardSkeleton"
 import DeviceInfoItemSkeleton from "@/components/Skeleton/DeviceInfoItemSkeleton"
-import DeviceInfoCard from "@/components/DeviceInfo/DeviceInfoCard"
-import DeviceInfoItem from "@/components/DeviceInfo/DeviceInfoItem"
+import useDeviceInfo from "@/hooks/useDeviceInfo"
+import { type Device, DeviceState } from "@/types/device"
+import { convertStorageUnit, getPercentage, secondsForHuman } from "@/utils/converter"
 
 const DeviceInfo: FC<{ device: Device }> = ({ device }) => {
     const { deviceInfo, upTimeSecond, isLoading, isValidating, mutate } = useDeviceInfo(device)

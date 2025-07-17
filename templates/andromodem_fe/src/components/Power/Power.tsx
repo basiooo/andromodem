@@ -2,10 +2,9 @@ import { FaAndroid, FaPowerOff } from "react-icons/fa"
 import { IoMdSettings } from "react-icons/io"
 import { MdOutlineRestartAlt } from "react-icons/md"
 
+import PowerActionConfirmModal from "@/components/Modal/PowerActionConfirmModal"
 import usePowerActions from "@/hooks/usePowerActions"
 import { type Device } from "@/types/device"
-
-import PowerActionConfirmModal from "@/components/Modal/PowerActionConfirmModal"
 
 
 type props = {

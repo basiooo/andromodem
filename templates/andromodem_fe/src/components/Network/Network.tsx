@@ -1,20 +1,19 @@
 import type { FC } from "react"
 import { LuRefreshCw } from "react-icons/lu"
 
-import useNetwork from "@/hooks/useNetwork"
-import useTabManagement from "@/hooks/useTabManagement"
-import { useDevicesStore } from "@/stores/devicesStore"
-import { type Device,DeviceState } from "@/types/device"
-import { isFeatureAvailable } from "@/utils/common"
-
 import LoadingOverlay from "@/components/Loading/LoadingOverlay"
 import ApnModal from "@/components/Modal/ApnModal"
-import NetworkCardSkeleton from "@/components/Skeleton/NetworkCardSkeleton"
 import AccessPointName from "@/components/Network/AccessPointName"
 import AirplaneMode from "@/components/Network/AirplaneMode"
 import IpRoutes from "@/components/Network/IpRoutes"
 import MobileData from "@/components/Network/MobileData"
 import SimInfoDisplay from "@/components/Network/SimInfo"
+import NetworkCardSkeleton from "@/components/Skeleton/NetworkCardSkeleton"
+import useNetwork from "@/hooks/useNetwork"
+import useTabManagement from "@/hooks/useTabManagement"
+import { useDevicesStore } from "@/stores/devicesStore"
+import { type Device,DeviceState } from "@/types/device"
+import { isFeatureAvailable } from "@/utils/common"
 
 const Network: FC<{ device: Device }> = ({ device }) => {
     const {

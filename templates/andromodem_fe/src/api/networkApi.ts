@@ -1,7 +1,6 @@
+import {apiClient} from "@/api/apiClient"
 import type { NetworkInfoResponse } from "@/types/network"
 import type { BaseResponse } from "@/types/response"
-
-import {apiClient} from "@/api/apiClient"
 
 export const networkApi = {
     getNetworkInfo: async (serial: string) => {

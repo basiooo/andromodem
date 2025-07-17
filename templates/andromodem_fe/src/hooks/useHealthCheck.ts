@@ -1,4 +1,5 @@
 import useSWR from 'swr'
+
 import { HealthApi } from '@/api/healthApi'
 import type { BaseResponse } from '@/types/response'
 
@@ -11,7 +12,7 @@ const useHealthCheck = () => {
     {
       revalidateIfStale: false,
       revalidateOnFocus: false,
-      revalidateOnReconnect: false,
+      revalidateOnReconnect: false
     }
   )
 

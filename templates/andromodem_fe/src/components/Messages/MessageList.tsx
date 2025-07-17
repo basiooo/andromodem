@@ -3,11 +3,10 @@ import { LuRefreshCw } from "react-icons/lu"
 import { MdBlock } from 'react-icons/md'
 import { TbMessages } from 'react-icons/tb'
 
+import MessageItem from "@/components/Messages/MessageItem"
+import MessageItemSkeleton from "@/components/Skeleton/MessageItemSkeleteon"
 import useMessages from "@/hooks/useMessages"
 import { type Device, DeviceState } from "@/types/device"
-
-import MessageItemSkeleton from "@/components/Skeleton/MessageItemSkeleteon"
-import MessageItem from "@/components/Messages/MessageItem"
 
 
 type props = {

@@ -4,15 +4,14 @@ import {MdMessage, MdPermDeviceInformation, MdSettingsPower} from "react-icons/m
 import { TbAutomation } from "react-icons/tb"
 
 import DeviceInfo from "@/components/DeviceInfo/DeviceInfo"
+import FeatureAvailability from "@/components/FeatureAvailability/FeatureAvailability"
 import MessageList from "@/components/Messages/MessageList"
+import Monitoring from "@/components/Monitoring/Monitoring"
+import Network from "@/components/Network/Network"
 import Power from "@/components/Power/Power"
 import useTabManagement from "@/hooks/useTabManagement"
 import { useDevicesStore } from "@/stores/devicesStore"
 import { DeviceState } from "@/types/device"
-
-import FeatureAvailability from "@/components/FeatureAvailability/FeatureAvailability"
-import Monitoring from "@/components/Monitoring/Monitoring"
-import Network from "@/components/Network/Network"
 
 const Content: FC = () => {
     const { deviceUsed } = useDevicesStore()

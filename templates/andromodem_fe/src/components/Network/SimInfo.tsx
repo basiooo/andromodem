@@ -1,9 +1,9 @@
 import type { FC } from "react"
 import { TbMobiledata } from "react-icons/tb"
 
+import SignalStrengthIcon from "@/components/Network/SignalStrengthIcon"
 import useMobileDataStatus from "@/hooks/useMobileDataStatus"
 import type { SimInfo as SimInfoType } from "@/types/network"
-import SignalStrengthIcon from "@/components/Network/SignalStrengthIcon"
 
 
 interface SimInfoProps {
