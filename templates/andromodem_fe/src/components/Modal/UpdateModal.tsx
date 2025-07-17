@@ -64,7 +64,7 @@ const UpdateModal = ({ updateInfo, modal_id }: Props) => {
 
                                 <div className="bg-base-20">
                                     <ReactMarkdown>
-                                        ```curl https://raw.githubusercontent.com/basiooo/andromodem/refs/heads/main/andromodem_openwrt.sh | sh -s update
+                                        ```wget -qO- https://raw.githubusercontent.com/basiooo/andromodem/main/andromodem_openwrt.sh | sh -s update
                                         ```
                                     </ReactMarkdown>
                                 </div>
