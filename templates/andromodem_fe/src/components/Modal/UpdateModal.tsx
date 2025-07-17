@@ -57,18 +57,7 @@ const UpdateModal = ({ updateInfo, modal_id }: Props) => {
                             <div className="flex items-center justify-between mb-3">
                                 <h4 className="font-semibold text-lg">How to Update</h4>
                             </div>
-                            <span>
-                                Copy and run in terminal
-                            </span>
-                            <div className="bg-base-300 p-4 rounded-lg max-h-96 overflow-y-auto">
-
-                                <div className="bg-base-20">
-                                    <ReactMarkdown>
-                                        ```wget -qO- https://raw.githubusercontent.com/basiooo/andromodem/main/andromodem_openwrt.sh | sh -s update
-                                        ```
-                                    </ReactMarkdown>
-                                </div>
-                            </div>
+                            <a className="link" target="_blank" rel="noreferrer" href="https://github.com/basiooo/andromodem?tab=readme-ov-file#option-3-openwrt-installation">See update instructions.</a>
                         </div>
                     </>
                 )}
