@@ -99,6 +99,11 @@ go build -o andromodem cmd/andromodem/main.go
 bash <(wget -qO- https://raw.githubusercontent.com/basiooo/andromodem/main/andromodem_openwrt.sh)
 ```
 
+#### Option 4: OpenWrt Installation (if your shell not support substitution process like ash)
+```bash
+# One-line installation on OpenWrt
+wget -qO- https://raw.githubusercontent.com/basiooo/andromodem/main/andromodem_openwrt.sh | sh -s reinstall
+```
 ---
 
 ## 🎮 Usage
