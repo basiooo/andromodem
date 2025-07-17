@@ -47,7 +47,6 @@ func (r *Router) GetRouters() chi.Router {
 		middleware.Logger,
 		// middleware.StripSlashes,
 		appMiddleware.Recoverer(r.Logger),
-		appMiddleware.AdbChecker(r.Adb, r.Logger),
 		cors.Handler(cors.Options{
 			AllowedOrigins: []string{"https://*", "http://*"},
 			AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -74,33 +73,34 @@ func (r *Router) GetRouters() chi.Router {
 	// Frontend Handler
 	frontendHandler := web.NewFrontendHandler(r.Logger, templates.MainPage)
 
-	r.ChiRouter.Route("/api", func(r chi.Router) {
-		r.Get("/devices/{serial}", devicesHandler.GetDeviceInfo)
-		r.Post("/devices/{serial}/power", devicesHandler.PowerAction)
-		r.Get("/devices/{serial}/feature-availabilities", devicesHandler.GetDeviceFeatureAvailabilities)
-		r.Get("/devices/{serial}/messages", messagesHandler.GetMessages)
-		r.Get("/devices/{serial}/network", networkHandler.GetNetworkInfo)
-		r.Post("/devices/{serial}/network/mobile-data", networkHandler.ToggleMobileData)
-		r.Post("/devices/{serial}/network/airplane-mode", networkHandler.ToggleAirplaneMode)
+	r.ChiRouter.Route("/api", func(chiRouter chi.Router) {
+		chiRouter.Use(appMiddleware.AdbChecker(r.Adb, r.Logger))
+		chiRouter.Get("/devices/{serial}", devicesHandler.GetDeviceInfo)
+		chiRouter.Post("/devices/{serial}/power", devicesHandler.PowerAction)
+		chiRouter.Get("/devices/{serial}/feature-availabilities", devicesHandler.GetDeviceFeatureAvailabilities)
+		chiRouter.Get("/devices/{serial}/messages", messagesHandler.GetMessages)
+		chiRouter.Get("/devices/{serial}/network", networkHandler.GetNetworkInfo)
+		chiRouter.Post("/devices/{serial}/network/mobile-data", networkHandler.ToggleMobileData)
+		chiRouter.Post("/devices/{serial}/network/airplane-mode", networkHandler.ToggleAirplaneMode)
 
-		r.Route("/devices/{serial}/monitoring", func(r chi.Router) {
-			r.Post("/", monitoringHandler.CreateMonitoring)
-			r.Get("/", monitoringHandler.GetMonitoringConfig)
-			r.Put("/", monitoringHandler.UpdateMonitoringConfig)
-			r.Post("/start", monitoringHandler.StartMonitoring)
-			r.Post("/stop", monitoringHandler.StopMonitoring)
-			r.Get("/status", monitoringHandler.GetMonitoringStatus)
-			r.Get("/logs", monitoringHandler.GetMonitoringLogs)
-			r.Delete("/logs", monitoringHandler.ClearMonitoringLogs)
+		chiRouter.Route("/devices/{serial}/monitoring", func(chiRouter chi.Router) {
+			chiRouter.Post("/", monitoringHandler.CreateMonitoring)
+			chiRouter.Get("/", monitoringHandler.GetMonitoringConfig)
+			chiRouter.Put("/", monitoringHandler.UpdateMonitoringConfig)
+			chiRouter.Post("/start", monitoringHandler.StartMonitoring)
+			chiRouter.Post("/stop", monitoringHandler.StopMonitoring)
+			chiRouter.Get("/status", monitoringHandler.GetMonitoringStatus)
+			chiRouter.Get("/logs", monitoringHandler.GetMonitoringLogs)
+			chiRouter.Delete("/logs", monitoringHandler.ClearMonitoringLogs)
 		})
 
-		r.Get("/monitoring", monitoringHandler.GetAllMonitoringTasks)
+		chiRouter.Get("/monitoring", monitoringHandler.GetAllMonitoringTasks)
 	})
 
-	r.ChiRouter.Route("/event", func(r chi.Router) {
-		r.Get("/devices", devicesEventHandler.ListenDevicesEvent)
-		r.Route("/devices/{serial}/monitoring", func(r chi.Router) {
-			r.Get("/logs", monitoringLogEventHandler.ListenMonitoringLogEvent)
+	r.ChiRouter.Route("/event", func(chiRouter chi.Router) {
+		chiRouter.Get("/devices", devicesEventHandler.ListenDevicesEvent)
+		chiRouter.Route("/devices/{serial}/monitoring", func(chiRouter chi.Router) {
+			chiRouter.Get("/logs", monitoringLogEventHandler.ListenMonitoringLogEvent)
 		})
 	})
 
