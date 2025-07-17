@@ -3,8 +3,8 @@ import { TbMobiledata } from "react-icons/tb"
 
 import useMobileDataStatus from "@/hooks/useMobileDataStatus"
 import type { SimInfo as SimInfoType } from "@/types/network"
+import SignalStrengthIcon from "@/components/Network/SignalStrengthIcon"
 
-import SignalStrengthIcon from "./SignalStrengthIcon"
 
 interface SimInfoProps {
   sims: SimInfoType[]

@@ -1,6 +1,6 @@
 import type { DeviceFeatureAvailabilityResponse, DeviceInfoResponse } from "@/types/device"
 
-import {apiClient} from "./apiClient"
+import {apiClient} from "@/api/apiClient"
 
 export const deviceApi = {
     getDeviceInfo: async (serial: string) => {

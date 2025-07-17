@@ -10,9 +10,9 @@ import useTabManagement from "@/hooks/useTabManagement"
 import { useDevicesStore } from "@/stores/devicesStore"
 import { DeviceState } from "@/types/device"
 
-import FeatureAvailability from "../FeatureAvailability/FeatureAvailability"
-import Monitoring from "../Monitoring/Monitoring"
-import Network from "../Network/Network"
+import FeatureAvailability from "@/components/FeatureAvailability/FeatureAvailability"
+import Monitoring from "@/components/Monitoring/Monitoring"
+import Network from "@/components/Network/Network"
 
 const Content: FC = () => {
     const { deviceUsed } = useDevicesStore()

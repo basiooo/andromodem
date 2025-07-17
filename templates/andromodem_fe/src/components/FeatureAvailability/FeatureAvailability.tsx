@@ -4,7 +4,7 @@ import useFeatureAvailability from "@/hooks/useFeatureAvailability"
 import { type Device,DeviceState } from "@/types/device"
 import { showModal } from "@/utils/common"
 
-import FeatureAvailabilityModal from "../Modal/FeatureAvailabilityModal"
+import FeatureAvailabilityModal from "@/components/Modal/FeatureAvailabilityModal"
 
 const FeatureAvailability: FC<{ device: Device }> = ({ device }) => {
     const { deviceFeatureAvailabilities } = useFeatureAvailability(device)

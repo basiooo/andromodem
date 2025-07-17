@@ -1,7 +1,7 @@
 import type { DeviceMonitoringResponse, MonitoringConfigPayload } from "@/types/monitoring"
 import type { BaseResponse } from "@/types/response"
 
-import { apiClient } from "./apiClient"
+import { apiClient } from "@/api/apiClient"
 
 export const monitoringApi = {
     getDeviceMonitoringConfiguration: async (serial: string)=>{

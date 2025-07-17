@@ -7,14 +7,14 @@ import { useDevicesStore } from "@/stores/devicesStore"
 import { type Device,DeviceState } from "@/types/device"
 import { isFeatureAvailable } from "@/utils/common"
 
-import LoadingOverlay from "../Loading/LoadingOverlay"
-import ApnModal from "../Modal/ApnModal"
-import NetworkCardSkeleton from "../Skeleton/NetworkCardSkeleton"
-import AccessPointName from "./AccessPointName"
-import AirplaneMode from "./AirplaneMode"
-import IpRoutes from "./IpRoutes"
-import MobileData from "./MobileData"
-import SimInfoDisplay from "./SimInfo"
+import LoadingOverlay from "@/components/Loading/LoadingOverlay"
+import ApnModal from "@/components/Modal/ApnModal"
+import NetworkCardSkeleton from "@/components/Skeleton/NetworkCardSkeleton"
+import AccessPointName from "@/components/Network/AccessPointName"
+import AirplaneMode from "@/components/Network/AirplaneMode"
+import IpRoutes from "@/components/Network/IpRoutes"
+import MobileData from "@/components/Network/MobileData"
+import SimInfoDisplay from "@/components/Network/SimInfo"
 
 const Network: FC<{ device: Device }> = ({ device }) => {
     const {

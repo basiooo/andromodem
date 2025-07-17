@@ -8,9 +8,9 @@ import type { Device } from "@/types/device"
 import type { MonitoringConfigPayload } from "@/types/monitoring"
 import { showModal } from "@/utils/common"
 
-import MonitoringConfigModal from "../Modal/MonitoringConfigModal"
-import MonitoringConfigCard from "./MonitoringConfigCard"
-import MonitoringLogCard from "./MonitoringLogCard"
+import MonitoringConfigModal from "@/components/Modal/MonitoringConfigModal"
+import MonitoringConfigCard from "@/components/Monitoring/MonitoringConfigCard"
+import MonitoringLogCard from "@/components/Monitoring/MonitoringLogCard"
 
 const Monitoring: FC<{ device: Device }> = ({ device }) => {
   const {

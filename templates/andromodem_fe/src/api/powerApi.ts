@@ -1,7 +1,7 @@
 import type { DevicePowerActionType } from "@/types/power"
 import type { BaseResponse } from "@/types/response"
 
-import {apiClient} from "./apiClient"
+import {apiClient} from "@/api/apiClient"
 
 export const PowerApi = {
     powerAction: async (serial: string, action: DevicePowerActionType) => {

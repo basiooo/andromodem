@@ -1,6 +1,6 @@
 import type { MessagesResponse } from "@/types/message"
 
-import {apiClient} from "./apiClient"
+import {apiClient} from "@/api/apiClient"
 
 export const MessageApi = {
     getMessages: async (serial: string) => {

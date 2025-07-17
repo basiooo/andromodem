@@ -6,8 +6,8 @@ import { TbMessages } from 'react-icons/tb'
 import useMessages from "@/hooks/useMessages"
 import { type Device, DeviceState } from "@/types/device"
 
-import MessageItemSkeleton from "../Skeleton/MessageItemSkeleteon"
-import MessageItem from './MessageItem'
+import MessageItemSkeleton from "@/components/Skeleton/MessageItemSkeleteon"
+import MessageItem from "@/components/Messages/MessageItem"
 
 
 type props = {

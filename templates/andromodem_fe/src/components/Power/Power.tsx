@@ -5,7 +5,7 @@ import { MdOutlineRestartAlt } from "react-icons/md"
 import usePowerActions from "@/hooks/usePowerActions"
 import { type Device } from "@/types/device"
 
-import PowerActionConfirmModal from "../Modal/PowerActionConfirmModal"
+import PowerActionConfirmModal from "@/components/Modal/PowerActionConfirmModal"
 
 
 type props = {

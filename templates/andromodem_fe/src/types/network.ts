@@ -1,4 +1,4 @@
-import type { BaseResponse } from "./response"
+import type { BaseResponse } from "@/types/response"
 
 export interface NetworkData {
   airplane_mode: boolean;
