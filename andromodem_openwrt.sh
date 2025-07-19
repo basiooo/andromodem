@@ -27,9 +27,31 @@ get_os_arch() {
 }
 
 get_latest_version() {
-    wget --server-response --spider "${GITHUB_REPO}/releases/latest" 2>&1 \
-        | awk '/^  Location: /{gsub(/\r/, "", $2); print $2}' \
-        | sed 's|.*/tag/v||'
+    if command -v curl >/dev/null 2>&1; then
+        version=$(curl -s "https://api.github.com/repos/basiooo/andromodem/releases/latest" | \
+                 grep '"tag_name":' | \
+                 sed -E 's/.*"tag_name":[[:space:]]*"v?([^"]+)".*/\1/')
+        
+        if [ -n "$version" ]; then
+            echo "$version"
+            return 0
+        fi
+    fi
+    
+    if command -v wget >/dev/null 2>&1; then
+        version=$(wget -qO- "https://api.github.com/repos/basiooo/andromodem/releases/latest" | \
+                 grep '"tag_name":' | \
+                 sed -E 's/.*"tag_name":[[:space:]]*"v?([^"]+)".*/\1/')
+        
+        if [ -n "$version" ]; then
+            echo "$version"
+            return 0
+        fi
+    fi
+    
+    wget --server-response --spider "${GITHUB_REPO}/releases/latest" 2>&1 | \
+        awk '/^  Location: /{gsub(/\r/, "", $2); print $2}' | \
+        sed 's|.*/tag/v||'
 }
 
 get_local_version() {
@@ -62,7 +84,7 @@ download_binary() {
     asset_url=$(wget -qO- "$api_url" | grep "browser_download_url" | grep "$os_arch" | cut -d '"' -f 4)
 
     if [ -z "$asset_url" ]; then
-        echo "❌ No asset found for architecture $os_arch in version v$version."
+        echo "❌ No asset found for architecture $os_arch in version v$version. url: $api_url"
         exit 1
     fi
 
