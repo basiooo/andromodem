@@ -27,8 +27,7 @@ const MonitoringConfigCard: FC<MonitoringConfigCardProps> = ({
   isStopping
 }) => {
   const deviceFeatureAvailabilities = useDevicesStore((state) => state.deviceFeatureAvailabilities)
-
-  const allowed = isFeatureAvailable(deviceFeatureAvailabilities, "can_create_monitoring_config")
+  const allowed = isFeatureAvailable(deviceFeatureAvailabilities, "can_change_airplane_mode_status")
   return (
     <div className="card w-full bg-base-100 shadow-sm">
       <div className="card-body">
