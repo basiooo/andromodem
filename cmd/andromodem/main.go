@@ -53,6 +53,13 @@ func main() {
 	}
 	validator := validator.New()
 	validator.RegisterTagNameFunc(utils.GetJSONFieldName)
+
+	// "Some OpenWRT devices do not detect connected Android devices automatically. Running adb devices is required for them to be recognized."
+	if err := utils.InitializeADB(appLogger); err != nil {
+		appLogger.Error("Failed to initialize ADB daemon",
+			zap.String("error", err.Error()))
+	}
+
 	router := router.NewRouter(adbClient, appLogger, ctx, validator)
 	server := server.NewServer(router.GetRouters(), appLogger, ctx, cancel)
 	if err := server.Start(); err != nil {
