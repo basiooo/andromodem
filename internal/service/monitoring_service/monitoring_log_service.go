@@ -86,65 +86,7 @@ func (s *MonitoringLogService) WriteLog(serial string, success bool, message str
 
 	s.NotifyNewLog(serial, log)
 
-	s.scheduleWrite(serial)
-}
-
-func (s *MonitoringLogService) scheduleWrite(serial string) {
-	s.writeMutex.Lock()
-	defer s.writeMutex.Unlock()
-
-	if _, exists := s.writeQueue[serial]; exists {
-		return
-	}
-
-	writeCtx, writeCancel := context.WithCancel(s.ctx)
-	writeChan := make(chan struct{}, 1)
-
-	s.writeQueue[serial] = &writeQueueItem{
-		writeChan:   writeChan,
-		writeCancel: writeCancel,
-	}
-
-	s.wg.Add(1)
-	go func() {
-		defer s.wg.Done()
-		defer writeCancel()
-
-		timer := time.NewTimer(100 * time.Millisecond)
-		defer timer.Stop()
-
-		for {
-			select {
-			case <-writeCtx.Done():
-				return
-			case <-timer.C:
-				s.writeBufferToFile(serial)
-
-				s.writeMutex.Lock()
-				if item, exists := s.writeQueue[serial]; exists {
-					item.writeCancel()
-					close(item.writeChan)
-					delete(s.writeQueue, serial)
-				}
-				s.writeMutex.Unlock()
-				return
-
-			case <-writeChan:
-				if !timer.Stop() {
-					select {
-					case <-timer.C:
-					default:
-					}
-				}
-				timer.Reset(100 * time.Millisecond)
-			}
-		}
-	}()
-
-	select {
-	case writeChan <- struct{}{}:
-	default:
-	}
+	s.writeBufferToFile(serial)
 }
 
 func (s *MonitoringLogService) Shutdown() {
