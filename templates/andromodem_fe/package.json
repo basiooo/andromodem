@@ -27,6 +27,8 @@
     "react-icons": "^5.5.0",
     "react-markdown": "^10.1.0",
     "react-toastify": "^11.0.5",
+    "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1",
     "swr": "^2.3.3",
     "tailwindcss": "^4.1.10",
     "theme-change": "^2.5.0",

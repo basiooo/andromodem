@@ -1,4 +1,6 @@
-import ReactMarkdown from "react-markdown"
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import remarkBreaks from 'remark-breaks'
 
 import type { UpdateInfo } from "@/types/update"
 
@@ -48,8 +50,35 @@ const UpdateModal = ({ updateInfo, modal_id }: Props) => {
 
                             <div className="bg-base-300 p-4 rounded-lg max-h-96 overflow-y-auto">
                                 <h5 className="font-semibold mb-3">Changelog:</h5>
-                                <div>
-                                    <ReactMarkdown>{(updateInfo.releaseInfo.body || "")}</ReactMarkdown>
+                                <div className="prose prose-sm max-w-none dark:prose-invert">
+                                    <Markdown 
+                                        remarkPlugins={[remarkGfm, remarkBreaks]}
+                                        components={{
+                                            h1: ({children}) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                                            h2: ({children}) => <h2 className="text-md font-semibold mb-2">{children}</h2>,
+                                            h3: ({children}) => <h3 className="text-sm font-semibold mb-1">{children}</h3>,
+                                            p: ({children}) => <p className="mb-2 leading-relaxed">{children}</p>,
+                                            ul: ({children}) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                                            li: ({children}) => <li className="ml-2">{children}</li>,
+                                            a: ({href, children}) => (
+                                                <a 
+                                                    href={href} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer" 
+                                                    className="text-blue-500 hover:text-blue-700 underline"
+                                                >
+                                                    {children}
+                                                </a>
+                                            ),
+                                            code: ({children}) => (
+                                                <code className="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded text-xs font-mono">
+                                                    {children}
+                                                </code>
+                                            )
+                                        }}
+                                    >
+                                        {updateInfo.releaseInfo.body || ""}
+                                    </Markdown>
                                 </div>
                             </div>
                         </div>
