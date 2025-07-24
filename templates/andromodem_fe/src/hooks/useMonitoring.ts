@@ -23,7 +23,8 @@ const useMonitoring = (device: Device | null) => {
     {
         revalidateIfStale: false,
         revalidateOnFocus: false,
-        revalidateOnReconnect: false
+        revalidateOnReconnect: false,
+        errorRetryCount: 0
     }
   )
 
