@@ -53,7 +53,7 @@ export const useMonitoringForm = ({
       host: '',
       max_failures: 3,
       checking_interval: 30,
-      airplane_mode_delay: 5,
+      airplane_mode_delay: 5
     },
     mode: 'onChange'
   })
@@ -83,7 +83,7 @@ export const useMonitoringForm = ({
         host: '',
         max_failures: 3,
         checking_interval: 30,
-        airplane_mode_delay: 5,
+        airplane_mode_delay: 5
       }
       
       originalDataRef.current = defaultData
