@@ -152,7 +152,7 @@ const MonitoringConfigModal: FC<MonitoringConfigModalProps> = ({
                 {...register('airplane_mode_delay', { valueAsNumber: true })}
               />
               <div className="label">
-                <span className="text-xs text-balance text-gray-500">Delay time before activating airplane mode after failure detection (0-3600 seconds)</span>
+                <span className="text-xs text-balance text-gray-500">Delay time before activating airplane mode after failure detection (1-3600 seconds)</span>
               </div>
               {errors.airplane_mode_delay && (
                 <label className="label">
