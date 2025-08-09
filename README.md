@@ -22,6 +22,18 @@ AndroModem is a comprehensive Android device management solution. Built with a G
 > **🛜 Designed for OpenWrt Users:**
 AndroModem is primarily designed for OpenWrt users who use Android phones as USB modems. It enables ADB-based monitoring and control directly from the router.
 
+## Screenshots
+
+![Device Info](screenshots/device_info.png)
+![Device Info Memory](screenshots/device_info2.png)
+![Device Info Battery](screenshots/device_info3.png)
+![Feature Check](screenshots/feature_check.png)
+![Messages](screenshots/messages.png)
+![Monitoring Configuration](screenshots/monitoring.png)
+![Monitoring](screenshots/monitoring2.png)
+![Network](screenshots/network.png)
+![Network APN](screenshots/network2.png)
+![Power](screenshots/power.png)
 
 
 ## ✨ Features
