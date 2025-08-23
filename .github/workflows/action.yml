@@ -29,9 +29,9 @@ jobs:
       run: go vet ./...
 
     - name: Install golangci-lint
-      uses: golangci/golangci-lint-action@v4
+      uses: golangci/golangci-lint-action@v8
       with:
-        version: latest
+        version: v2.4.0
         args: --timeout=5m
         skip-cache: true
 
