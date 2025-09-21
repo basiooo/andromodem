@@ -3,13 +3,13 @@ module github.com/basiooo/andromodem
 go 1.25.0
 
 require (
-	github.com/basiooo/goadb v1.0.1
-	github.com/go-chi/chi/v5 v5.2.2
+	github.com/basiooo/goadb v1.1.1
+	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-chi/cors v1.2.2
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	go.uber.org/zap v1.27.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )

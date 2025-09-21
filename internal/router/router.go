@@ -3,10 +3,13 @@ package router
 import (
 	"context"
 
-	RESTHandler "github.com/basiooo/andromodem/internal/handler/rest"
+	"github.com/basiooo/andromodem/internal/handler/rest"
+	"github.com/basiooo/andromodem/internal/handler/ws"
+
 	"github.com/basiooo/andromodem/internal/handler/web"
 	"github.com/basiooo/andromodem/internal/service/devices_service"
 	"github.com/basiooo/andromodem/internal/service/messages_service"
+	"github.com/basiooo/andromodem/internal/service/mirroring_service"
 	"github.com/basiooo/andromodem/internal/service/monitoring_service"
 	network_service "github.com/basiooo/andromodem/internal/service/network"
 	"github.com/basiooo/andromodem/templates"
@@ -61,15 +64,18 @@ func (r *Router) GetRouters() chi.Router {
 	messagesService := messages_service.NewMessagesService(r.Adb, adbProcessor, r.Logger, r.Ctx)
 	networkService := network_service.NewNetworkService(r.Adb, adbProcessor, r.Logger, r.Ctx)
 	monitoringService := monitoring_service.NewMonitoringService(r.Adb, adbProcessor, networkService, r.Logger, r.Ctx)
+	mirroringService := mirroring_service.NewMirroringService(r.Adb, r.Logger, r.Ctx)
 
 	// Handlers
 	devicesEventHandler := SSEHandler.NewDevicesEventHandler(devicesService, r.Logger)
 	monitoringLogEventHandler := SSEHandler.NewMonitoringLogEventHandler(monitoringService, r.Logger)
-	devicesHandler := RESTHandler.NewDevicesHandler(devicesService, r.Logger, r.Validator)
-	messagesHandler := RESTHandler.NewMessagesHandler(messagesService, r.Logger, r.Validator)
-	networkHandler := RESTHandler.NewNetworkHandler(networkService, r.Logger, r.Validator)
-	monitoringHandler := RESTHandler.NewMonitoringHandler(monitoringService, r.Logger, r.Validator)
-	healthHandler := RESTHandler.NewHealthHandler()
+	devicesHandler := rest.NewDevicesHandler(devicesService, r.Logger, r.Validator)
+	messagesHandler := rest.NewMessagesHandler(messagesService, r.Logger, r.Validator)
+	networkHandler := rest.NewNetworkHandler(networkService, r.Logger, r.Validator)
+	monitoringHandler := rest.NewMonitoringHandler(monitoringService, r.Logger, r.Validator)
+	mirroringHandler := ws.NewMirroringHandler(mirroringService, r.Logger)
+
+	healthHandler := rest.NewHealthHandler()
 
 	// Frontend Handler
 	frontendHandler := web.NewFrontendHandler(r.Logger, templates.MainPage)
@@ -107,6 +113,11 @@ func (r *Router) GetRouters() chi.Router {
 		})
 	})
 
+	r.ChiRouter.Route("/ws", func(chiRouter chi.Router) {
+		chiRouter.Route("/devices/{serial}", func(chiRouter chi.Router) {
+			chiRouter.Get("/mirroring", mirroringHandler.StartMirroringStream)
+		})
+	})
 	r.ChiRouter.Get("/assets/*", frontendHandler.ServeAssets().ServeHTTP)
 	r.ChiRouter.Get("/", frontendHandler.ServeIndex)
 	return r.ChiRouter
