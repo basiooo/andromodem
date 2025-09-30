@@ -84,7 +84,7 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
         disconnect()
         setIsDisconnecting(true)
         setCountdown(5)
-        
+
         const timer = setInterval(() => {
             setCountdown((prev) => {
                 if (prev <= 1) {
@@ -223,13 +223,11 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
         )
     }
     return (
-        <div
-            ref={mainContainerRef}
-            className="relative flex flex-col h-[500px] md:h-[700px]"
-        >
+
+        <>
             {
                 isConnected && !isFullscreen && (
-                    <div className="absolute top-2 right-2 z-30 flex space-x-2">
+                    <div className="mb-3">
                         <MirroringTool
                             isConnected={isConnected}
                             isConnecting={isConnecting}
@@ -241,39 +239,44 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
                     </div>
                 )
             }
+            <div
+                ref={mainContainerRef}
+                className="relative flex flex-col h-[500px] md:h-[700px]"
+            >
+                <div className="relative flex-1 w-full min-h-0">
+                    <video
+                        ref={videoRef}
+                        className="absolute inset-0 w-full h-full object-contain"
+                        autoPlay
+                        muted
+                        playsInline
+                    />
+                    <canvas
+                        ref={canvasRef}
+                        className="absolute inset-0 w-full h-full object-contain z-10"
+                        style={{
+                            touchAction: 'none',
+                            userSelect: 'none',
+                            background: 'transparent',
+                            pointerEvents: 'auto'
+                        }}
+                    />
 
-            <div className="relative flex-1 w-full min-h-0">
-                <video
-                    ref={videoRef}
-                    className="absolute inset-0 w-full h-full object-contain"
-                    autoPlay
-                    muted
-                    playsInline
-                />
-                <canvas
-                    ref={canvasRef}
-                    className="absolute inset-0 w-full h-full object-contain z-10"
-                    style={{
-                        touchAction: 'none',
-                        userSelect: 'none',
-                        background: 'transparent',
-                        pointerEvents: 'auto'
-                    }}
-                />
+                </div>
 
+                {isConnected && (
+                    <div className="flex-shrink-0 w-full h-[60px]">
+                        <MirroringNavigation
+                            isConnected={isConnected}
+                            isFullscreen={isFullscreen}
+                            onToggleFullscreen={toggleFullscreen}
+                            onSendKeyCommand={handleKeyCommand}
+                        />
+                    </div>
+                )}
             </div>
 
-            {isConnected && (
-                <div className="flex-shrink-0 w-full h-[60px]">
-                    <MirroringNavigation
-                        isConnected={isConnected}
-                        isFullscreen={isFullscreen}
-                        onToggleFullscreen={toggleFullscreen}
-                        onSendKeyCommand={handleKeyCommand}
-                    />
-                </div>
-            )}
-        </div>
+        </>
     )
 }
 export default MirroringCanvas

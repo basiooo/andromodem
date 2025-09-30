@@ -1,4 +1,5 @@
 import React from 'react'
+import { TbArrowsMaximize } from 'react-icons/tb';
 
 interface MirroringToolProps {
   isConnected: boolean;
@@ -17,17 +18,17 @@ const MirroringTool: React.FC<MirroringToolProps> = ({
     <>
         <button
           onClick={onDisconnect}
-          className="btn btn-soft btn-error"
+          className="btn btn-soft btn-sm md:btn-md btn-error"
         >
           Disconnect
         </button>
 
       <button
         onClick={onToggleFullscreen}
-        className="btn btn-primary"
+        className="btn btn-primary ml-3 btn-sm md:btn-md"
         title="Enter Fullscreen"
       >
-        ⤢
+        <TbArrowsMaximize fontSize={24} />
       </button>
       </>
       
