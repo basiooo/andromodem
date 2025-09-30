@@ -8,6 +8,14 @@ export const getBaseUrl = (): string => {
     return `${location.protocol}//${location.host}`
 }
 
+export const getBaseUrlWs = (): string => {
+    if (import.meta.env.MODE === "development") {
+        // TODO: Move the development server URL to environment variables (.env) file
+        return "ws://localhost:49153"
+    }
+    return `ws://${location.host}`
+}
+
 export const showModal = (modal_id: string) => {
     const modal = document.getElementById(modal_id) as HTMLDialogElement | null
     if (modal) {

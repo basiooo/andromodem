@@ -19,6 +19,7 @@
     "@tailwindcss/vite": "^4.1.10",
     "axios": "^1.12.2",
     "eslint-plugin-simple-import-sort": "^12.1.1",
+    "jmuxer": "^2.0.7",
     "lucide-react": "^0.522.0",
     "react": "^19.1.0",
     "react-anchorme": "^5.0.0",
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@types/jmuxer": "^2.0.7",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",

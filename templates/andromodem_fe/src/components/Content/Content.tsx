@@ -1,4 +1,5 @@
 import { type FC } from "react"
+import { CgScreenMirror } from "react-icons/cg"
 import { GiNetworkBars } from "react-icons/gi"
 import {MdMessage, MdPermDeviceInformation, MdSettingsPower} from "react-icons/md"
 import { TbAutomation } from "react-icons/tb"
@@ -12,6 +13,8 @@ import Power from "@/components/Power/Power"
 import useTabManagement from "@/hooks/useTabManagement"
 import { useDevicesStore } from "@/stores/devicesStore"
 import { DeviceState } from "@/types/device"
+
+import Mirroring from "../Mirroring/Mirroring"
 
 const Content: FC = () => {
     const { deviceUsed } = useDevicesStore()
@@ -52,6 +55,11 @@ const Content: FC = () => {
             key: "device_power",
             label: "Power",
             icon: <MdSettingsPower className="w-4 h-4 mr-2" />
+        },
+        {
+            key: "mirroring",
+            label: "Mirroring",
+            icon: <CgScreenMirror className="w-4 h-4 mr-2" />
         }
     ]
 
@@ -67,6 +75,8 @@ const Content: FC = () => {
                 return <Monitoring device={deviceUsed}/>
             case "device_power":
                 return <Power device={deviceUsed}/>
+            case "mirroring":
+                return <Mirroring device={deviceUsed}/>
             default:
                 return <DeviceInfo device={deviceUsed}/>
         }
