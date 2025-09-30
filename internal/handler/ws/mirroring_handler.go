@@ -42,7 +42,12 @@ func (h *MirroringHandler) StartMirroringStream(w http.ResponseWriter, r *http.R
 	h.mu.Lock()
 	if oldConn, ok := h.activeConns[serial]; ok {
 		h.Logger.Info("closing old websocket connection", zap.String("serial", serial))
-		oldConn.Close()
+		if err := oldConn.Close(); err != nil {
+			h.Logger.Error("failed to close old websocket connection",
+				zap.String("serial", serial),
+				zap.Error(err),
+			)
+		}
 		for {
 			if ok := h.MirroringService.GetClient(serial); ok == nil {
 				break
@@ -129,7 +134,12 @@ func (h *MirroringHandler) StartMirroringStream(w http.ResponseWriter, r *http.R
 			return
 		}
 
-		conn.SetWriteDeadline(time.Now().Add(5 * time.Second))
+		if err := conn.SetWriteDeadline(time.Now().Add(5 * time.Second)); err != nil {
+			h.Logger.Warn("failed to set write deadline",
+				zap.String("serial", serial),
+				zap.Error(err),
+			)
+		}
 
 		if err := conn.WriteMessage(websocket.BinaryMessage, chunk); err != nil {
 			h.Logger.Warn("failed to send video chunk",

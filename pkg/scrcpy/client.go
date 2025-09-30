@@ -146,15 +146,33 @@ func (c *Client) ConnectToStream() error {
 	c.ControlConn = controlConn
 
 	if tcpConn, ok := c.VideoConn.(*net.TCPConn); ok {
-		tcpConn.SetNoDelay(true)
-		tcpConn.SetKeepAlive(true)
-		tcpConn.SetKeepAlivePeriod(30 * time.Second)
+		if err := tcpConn.SetNoDelay(true); err != nil {
+			c.Logger.Error("Failed to set TCP no delay", zap.Error(err))
+			return fmt.Errorf("set TCP no delay: %w", err)
+		}
+		if err := tcpConn.SetKeepAlive(true); err != nil {
+			c.Logger.Error("Failed to set TCP keep alive", zap.Error(err))
+			return fmt.Errorf("set TCP keep alive: %w", err)
+		}
+		if err := tcpConn.SetKeepAlivePeriod(30 * time.Second); err != nil {
+			c.Logger.Error("Failed to set TCP keep alive period", zap.Error(err))
+			return fmt.Errorf("set TCP keep alive period: %w", err)
+		}
 	}
 
 	if tcpConn, ok := c.ControlConn.(*net.TCPConn); ok {
-		tcpConn.SetNoDelay(true)
-		tcpConn.SetKeepAlive(true)
-		tcpConn.SetKeepAlivePeriod(30 * time.Second)
+		if err := tcpConn.SetNoDelay(true); err != nil {
+			c.Logger.Error("Failed to set TCP no delay", zap.Error(err))
+			return fmt.Errorf("set TCP no delay: %w", err)
+		}
+		if err := tcpConn.SetKeepAlive(true); err != nil {
+			c.Logger.Error("Failed to set TCP keep alive", zap.Error(err))
+			return fmt.Errorf("set TCP keep alive: %w", err)
+		}
+		if err := tcpConn.SetKeepAlivePeriod(30 * time.Second); err != nil {
+			c.Logger.Error("Failed to set TCP keep alive period", zap.Error(err))
+			return fmt.Errorf("set TCP keep alive period: %w", err)
+		}
 	}
 
 	c.Logger.Info("Successfully connected to video and control streams")

@@ -89,7 +89,6 @@ func (c *ControlHandler) SendTouchEvent(event *TouchEvent) error {
 	offset += 4
 
 	binary.BigEndian.PutUint32(buf[offset:], 0)
-	offset += 4
 
 	c.client.Logger.Debug("sending touch event",
 		zap.Int32("action", int32(event.Action)),
@@ -101,7 +100,13 @@ func (c *ControlHandler) SendTouchEvent(event *TouchEvent) error {
 		zap.Uint32("height", c.client.Height),
 	)
 
-	c.client.ControlConn.SetWriteDeadline(time.Now().Add(5 * time.Second))
+	if err := c.client.ControlConn.SetWriteDeadline(time.Now().Add(5 * time.Second)); err != nil {
+		c.client.Logger.Error("failed to set write deadline",
+			zap.Error(err),
+			zap.Int32("action", int32(event.Action)),
+		)
+		return fmt.Errorf("set write deadline: %w", err)
+	}
 	n, err := c.client.ControlConn.Write(buf)
 	if err != nil {
 		c.client.Logger.Error("failed to send touch event",
@@ -175,7 +180,13 @@ func (c *ControlHandler) SendKeyEvent(event *KeyEvent) error {
 		zap.Int("buffer_size", offset),
 	)
 
-	c.client.ControlConn.SetWriteDeadline(time.Now().Add(5 * time.Second))
+	if err := c.client.ControlConn.SetWriteDeadline(time.Now().Add(5 * time.Second)); err != nil {
+		c.client.Logger.Error("failed to set write deadline",
+			zap.Error(err),
+			zap.Int32("keycode", int32(event.KeyCode)),
+		)
+		return fmt.Errorf("set write deadline: %w", err)
+	}
 	n, err := c.client.ControlConn.Write(buf)
 	if err != nil {
 		c.client.Logger.Error("failed to send key event",

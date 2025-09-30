@@ -1,5 +1,5 @@
 import React from 'react'
-import { TbArrowsMaximize } from 'react-icons/tb';
+import { TbArrowsMaximize } from 'react-icons/tb'
 
 interface MirroringToolProps {
   isConnected: boolean;

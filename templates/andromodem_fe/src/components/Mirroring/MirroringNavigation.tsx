@@ -1,9 +1,9 @@
 import { type FC } from "react"
+import { AiOutlineFullscreenExit } from "react-icons/ai"
 import { IoChevronBackOutline } from "react-icons/io5"
 import { MdPowerSettingsNew } from "react-icons/md"
 import { RiHomeLine } from "react-icons/ri"
 import { TbBoxMultiple } from "react-icons/tb"
-import { AiOutlineFullscreenExit } from "react-icons/ai";
 
 import { KeyCommand } from "@/types/mirroring"
 
