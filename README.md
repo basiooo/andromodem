@@ -34,6 +34,7 @@ AndroModem is primarily designed for OpenWrt users who use Android phones as USB
 ![Network](screenshots/network.png)
 ![Network APN](screenshots/network2.png)
 ![Power](screenshots/power.png)
+![Mirroring](screenshots/mirroring.png)
 
 
 ## ✨ Features
@@ -63,6 +64,9 @@ AndroModem is primarily designed for OpenWrt users who use Android phones as USB
 - **Device Selector**: Intuitive switching between multiple devices
 - **Theme Support**: Multiple UI themes with DaisyUI components
 
+### 🎥 **Mirroring**
+- **Screen Mirroring**: Stream device screen to a connected display
+- **Touch Control**: Enable touch input on the mirroring display
 
 ## 🚀 Installation
 
