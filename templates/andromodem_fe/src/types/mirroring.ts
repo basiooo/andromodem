@@ -21,6 +21,8 @@ export type KeyCommandValue = typeof KeyCommand[keyof typeof KeyCommand];
 export const MessageType = {
   TOUCH: "touch",
   KEY: "key",
+  PING: "ping",
+  SETUP: "setup",
   CONNECTED: "connected",
   ERROR: "error"
 } as const
@@ -65,11 +67,18 @@ export interface ErrorMessage {
 
 export type WebSocketMessage = ConnectedMessage | ErrorMessage;
 
+export interface SetupMirroring {
+  type: typeof MessageType.SETUP;
+  fps: FPSValue;
+  resolution: ScreenResolutionValue;
+  bitrate: BitRateValue;
+}
+
 export interface UseMirroringWebSocketOptions {
   device: Device;
-  onConnected?: (data: ConnectedMessage) => void;
-  onError?: (error: string) => void;
-  onVideoFrame?: (frame: ArrayBuffer) => void;
+  onConnected: () => void;
+  onError: (error: string) => void;
+  onVideoFrame: (frame: ArrayBuffer) => void;
 }
 
 export interface UseMirroringWebSocketReturn {
@@ -78,7 +87,7 @@ export interface UseMirroringWebSocketReturn {
   error: string | null;
   sendTouchEvent: (event: TouchMessage) => void;
   sendKeyEvent: (event: KeyMessage) => void;
-  connect: () => void;
+  connect: (options: SetupMirroring) => void;
   disconnect: () => void;
   screenDimensions: { width: number; height: number } | null;
 }
@@ -108,9 +117,7 @@ export interface RelativeCoordinates {
 }
 
 export const ScreenResolution = {
-  144: 144,
-  240: 240,
-  320: 320,
+  360: 360,
   480: 480,
   720: 720,
   1080: 1080,
@@ -118,14 +125,14 @@ export const ScreenResolution = {
 export type ScreenResolutionValue = typeof ScreenResolution[keyof typeof ScreenResolution];
 
 export const BitRate = {
-  1: 1000,
-  2: 2000,
-  3: 3000,
-  4: 4000,
-  5: 5000,
-  6: 6000,
-  7: 7000,
-  8: 8000,
+  1: 1000000,
+  2: 2000000,
+  3: 3000000,
+  4: 4000000,
+  5: 5000000,
+  6: 6000000,
+  7: 7000000,
+  8: 8000000,
 } as const
 export type BitRateValue = typeof BitRate[keyof typeof BitRate];
 

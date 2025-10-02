@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	andromodemError "github.com/basiooo/andromodem/internal/errors"
+	"github.com/basiooo/andromodem/internal/model"
 	"github.com/basiooo/andromodem/pkg/scrcpy"
 	adb "github.com/basiooo/goadb"
 	"go.uber.org/zap"
@@ -30,7 +31,7 @@ func NewMirroringService(adb *adb.Adb, logger *zap.Logger, ctx context.Context) 
 	}
 }
 
-func (m *MirroringService) StartMirroring(ctx context.Context, serial string) (*scrcpy.Client, error) {
+func (m *MirroringService) StartMirroring(ctx context.Context, serial string, setup *model.MirroringSetupRequest) (*scrcpy.Client, error) {
 	device, err := m.Adb.GetDeviceBySerial(serial)
 	if err != nil || device == nil {
 		m.Logger.Error("error getting device by serial",
@@ -48,8 +49,9 @@ func (m *MirroringService) StartMirroring(ctx context.Context, serial string) (*
 	m.mutex.RUnlock()
 
 	config := scrcpy.NewDefaultConfigWithOptions(&scrcpy.Options{
-		MaxSize: 1080,
-		MaxFps:  60,
+		MaxSize: setup.Resolution,
+		MaxFps:  setup.FPS,
+		Bitrate: setup.Bitrate,
 	})
 
 	client := scrcpy.NewClient(ctx, device, config, m.Logger)

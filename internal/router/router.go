@@ -73,7 +73,7 @@ func (r *Router) GetRouters() chi.Router {
 	messagesHandler := rest.NewMessagesHandler(messagesService, r.Logger, r.Validator)
 	networkHandler := rest.NewNetworkHandler(networkService, r.Logger, r.Validator)
 	monitoringHandler := rest.NewMonitoringHandler(monitoringService, r.Logger, r.Validator)
-	mirroringHandler := ws.NewMirroringHandler(mirroringService, r.Logger)
+	mirroringHandler := ws.NewMirroringHandler(mirroringService, r.Logger, r.Validator)
 
 	healthHandler := rest.NewHealthHandler()
 

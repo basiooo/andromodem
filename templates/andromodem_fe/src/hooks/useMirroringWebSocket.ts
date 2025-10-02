@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 
 import { config } from '@/config'
 import { DeviceState } from '@/types/device'
@@ -6,6 +6,7 @@ import type {
   ConnectedMessage, 
   ConnectionStateValue, 
   KeyMessage,
+  SetupMirroring,
   TouchMessage,
   UseMirroringWebSocketOptions, 
   UseMirroringWebSocketReturn, 
@@ -64,7 +65,7 @@ export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): Us
             height: connectedMsg.height 
           })
           setupPingInterval()
-          onConnected?.(connectedMsg)
+          onConnected?.()
           break
           
         case MessageType.ERROR:
@@ -95,39 +96,43 @@ export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): Us
     clearTimeouts()
   }
   
-  const connect = () => {
-    if (device.state !== DeviceState.ONLINE || wsRef.current?.readyState === WebSocket.OPEN) {
+  const connect = useCallback((setup: SetupMirroring) => {
+    if (
+      device.state !== DeviceState.ONLINE ||
+      wsRef.current?.readyState === WebSocket.OPEN ||
+      wsRef.current?.readyState === WebSocket.CONNECTING
+    ) {
       return
     }
-    
+
     isManualDisconnectRef.current = false
     setConnectionState(ConnectionState.CONNECTING)
     setError(null)
-    
+
     try {
       const wsUrl = `${config.BASE_URL_WS}/ws/devices/${device.serial}/mirroring`
       wsRef.current = new WebSocket(wsUrl)
       wsRef.current.binaryType = 'arraybuffer'
-      
+
       wsRef.current.onopen = () => {
         console.log('WebSocket connected')
+        wsRef.current?.send(JSON.stringify(setup))
       }
-      
+
       wsRef.current.onmessage = handleMessage
       wsRef.current.onerror = handleError
       wsRef.current.onclose = handleClose
-      
     } catch (err) {
       console.error('Failed to create WebSocket:', err)
       setError('Failed to create WebSocket connection')
       setConnectionState(ConnectionState.ERROR)
     }
-  }
+  }, [device.serial, device.state])
   
-  const disconnect = () => {
+  const disconnect = useCallback(() => {
     isManualDisconnectRef.current = true
     clearTimeouts()
-    
+
     if (wsRef.current) {
       wsRef.current.close()
       wsRef.current = null
@@ -135,7 +140,7 @@ export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): Us
     setConnectionState(ConnectionState.DISCONNECTED)
     setError(null)
     setScreenDimensions(null)
-  }
+  }, [])
   
   const sendTouchEvent = (event: TouchMessage) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {

@@ -3,11 +3,12 @@ package mirroring_service
 import (
 	"context"
 
+	"github.com/basiooo/andromodem/internal/model"
 	"github.com/basiooo/andromodem/pkg/scrcpy"
 )
 
 type IMirroringService interface {
-	StartMirroring(context.Context, string) (*scrcpy.Client, error)
+	StartMirroring(context.Context, string, *model.MirroringSetupRequest) (*scrcpy.Client, error)
 	CaptureVideoStream(string, func([]byte)) error
 	IsRunning(string) bool
 	SendTouchEvent(string, *scrcpy.TouchEvent) error

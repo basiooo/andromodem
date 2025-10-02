@@ -79,13 +79,13 @@ func (c *Client) StartServer() error {
 	}
 
 	cmd := fmt.Sprintf(
-		"CLASSPATH=%s app_process / com.genymobile.scrcpy.Server %s tunnel_forward=true audio=false control=true send_frame_meta=false send_device_meta=true max_size=%d max_fps=%d power_on=true",
+		"CLASSPATH=%s app_process / com.genymobile.scrcpy.Server %s tunnel_forward=true audio=false control=true send_frame_meta=false send_device_meta=true max_size=%d max_fps=%d video_bit_rate=%d power_on=true",
 		c.Config.RemoteServerPath,
 		c.Config.ServerVersion,
 		c.Config.Options.MaxSize,
 		c.Config.Options.MaxFps,
+		c.Config.Options.Bitrate,
 	)
-
 	c.Logger.Debug("scrcpy server command", zap.String("cmd", cmd))
 
 	go func() {

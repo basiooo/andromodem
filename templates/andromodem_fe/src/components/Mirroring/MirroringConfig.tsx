@@ -68,7 +68,7 @@ const MirroringConfig: FC<MirroringConfigProps> = ({
                 >
                     {Object.entries(BitRate).map(([key, value]) => (
                         <option key={value} value={value}>
-                            {key} Mbps
+                            {key} M
                         </option>
                     ))}
                 </select>

@@ -17,8 +17,9 @@ type Config struct {
 }
 
 type Options struct {
-	MaxSize uint32
-	MaxFps  uint32
+	MaxSize uint16
+	MaxFps  uint8
+	Bitrate uint32
 }
 
 func NewDefaultConfigWithOptions(options *Options) *Config {

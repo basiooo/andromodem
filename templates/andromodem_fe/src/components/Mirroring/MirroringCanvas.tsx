@@ -42,7 +42,7 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleConnected = (data: any) => {
+    const handleConnected = () => {
         toast.success('Mirroring server connected')
         setIsVideoReady(true)
     }
@@ -103,7 +103,12 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
 
     const handleConnect = () => {
         if (!isDisconnecting) {
-            connect()
+            connect({
+                fps,
+                resolution: screenResolution,
+                bitrate: bitrate,
+                type: MessageType.SETUP
+            })
         }
     }
 
