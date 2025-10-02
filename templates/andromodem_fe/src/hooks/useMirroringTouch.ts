@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import type {
+  TouchActionValue,
   TouchMessage,
   UseMirroringTouchOptions,
   UseMirroringTouchReturn
@@ -60,8 +61,8 @@ export const useMonitoringTouch = (options: UseMirroringTouchOptions): UseMirror
     }
   }, [canvasRef, screenWidth, screenHeight])
 
-  const createTouchMessage = useCallback((
-    action: TouchAction,
+  const createTouchMessage = (
+    action: TouchActionValue,
     clientX: number,
     clientY: number,
     pointerId: number,
@@ -85,18 +86,18 @@ export const useMonitoringTouch = (options: UseMirroringTouchOptions): UseMirror
       pointerId,
       pressure
     }
-  }, [canvasRef, videoDisplayArea])
+  }
 
-  const updateActivePointers = useCallback((pointerId: number, x: number, y: number, remove = false) => {
+  const updateActivePointers = (pointerId: number, x: number, y: number, remove = false) => {
     if (remove) {
       activePointers.delete(pointerId)
     } else {
       activePointers.set(pointerId, { x, y })
     }
     setIsActive(activePointers.size > 0)
-  }, [activePointers])
+  }
 
-  const handleTouchStart = useCallback((event: TouchEvent) => {
+  const handleTouchStart = (event: TouchEvent) => {
     if (!enabled || !canvasRef.current) return
 
     event.preventDefault()
@@ -111,9 +112,9 @@ export const useMonitoringTouch = (options: UseMirroringTouchOptions): UseMirror
         onTouchEvent(touchMessage)
       }
     }
-  }, [enabled, canvasRef, createTouchMessage, updateActivePointers, onTouchEvent])
+  }
 
-  const handleTouchMove = useCallback((event: TouchEvent) => {
+  const handleTouchMove = (event: TouchEvent) => {
     if (!enabled || !canvasRef.current) return
 
     event.preventDefault()
@@ -132,9 +133,9 @@ export const useMonitoringTouch = (options: UseMirroringTouchOptions): UseMirror
         }
       }
     }
-  }, [enabled, canvasRef, createTouchMessage, updateActivePointers, throttledSendTouchEvent, activePointers, onTouchEvent])
+  }
 
-  const handleTouchEnd = useCallback((event: TouchEvent) => {
+  const handleTouchEnd = (event: TouchEvent) => {
     if (!enabled || !canvasRef.current) return
 
     event.preventDefault()
@@ -152,9 +153,9 @@ export const useMonitoringTouch = (options: UseMirroringTouchOptions): UseMirror
     if (activePointers.size === 0) {
       setIsActive(false)
     }
-  }, [enabled, canvasRef, createTouchMessage, updateActivePointers, onTouchEvent, activePointers])
+  }
 
-  const handleTouchCancel = useCallback((event: TouchEvent) => {
+  const handleTouchCancel = (event: TouchEvent) => {
     if (!enabled || !canvasRef.current) return
 
     event.preventDefault()
@@ -168,9 +169,9 @@ export const useMonitoringTouch = (options: UseMirroringTouchOptions): UseMirror
         onTouchEvent(touchMessage)
       }
     }
-  }, [enabled, canvasRef, createTouchMessage, updateActivePointers, onTouchEvent])
+  }
 
-  const handleMouseDown = useCallback((event: MouseEvent) => {
+  const handleMouseDown = (event: MouseEvent) => {
     if (!enabled || !canvasRef.current) return
 
     event.preventDefault()
@@ -182,9 +183,9 @@ export const useMonitoringTouch = (options: UseMirroringTouchOptions): UseMirror
       updateActivePointers(0, touchMessage.x, touchMessage.y)
       onTouchEvent(touchMessage)
     }
-  }, [enabled, canvasRef, createTouchMessage, updateActivePointers, onTouchEvent])
+  }
 
-  const handleMouseMove = useCallback((event: MouseEvent) => {
+  const handleMouseMove = (event: MouseEvent) => {
     if (!enabled || !canvasRef.current || !isMouseDownRef.current) return
 
     event.preventDefault()
@@ -199,9 +200,9 @@ export const useMonitoringTouch = (options: UseMirroringTouchOptions): UseMirror
         onTouchEvent(cancelMessage)
       }
     }
-  }, [enabled, canvasRef, createTouchMessage, updateActivePointers, throttledSendTouchEvent, onTouchEvent])
+  }
 
-  const handleMouseUp = useCallback((event: MouseEvent) => {
+  const handleMouseUp = (event: MouseEvent) => {
     if (!enabled || !canvasRef.current || !isMouseDownRef.current) return
 
     event.preventDefault()
@@ -214,9 +215,9 @@ export const useMonitoringTouch = (options: UseMirroringTouchOptions): UseMirror
     }
 
     setIsActive(false)
-  }, [enabled, canvasRef, createTouchMessage, updateActivePointers, onTouchEvent])
+  }
 
-  const handleMouseLeave = useCallback((event: MouseEvent) => {
+  const handleMouseLeave = (event: MouseEvent) => {
     if (!enabled || !canvasRef.current || !isMouseDownRef.current) return
 
     event.preventDefault()
@@ -227,7 +228,7 @@ export const useMonitoringTouch = (options: UseMirroringTouchOptions): UseMirror
       updateActivePointers(0, touchMessage.x, touchMessage.y, true)
       onTouchEvent(touchMessage)
     }
-  }, [enabled, canvasRef, createTouchMessage, updateActivePointers, onTouchEvent])
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current

@@ -1,6 +1,5 @@
 import JMuxer from 'jmuxer'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { FaChromecast } from "react-icons/fa"
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 
 import MirroringNavigation from '@/components/Mirroring/MirroringNavigation'
@@ -9,8 +8,9 @@ import { useAspectRatio } from '@/hooks/useMirroringAspectRatio'
 import { useMirroringFullscreen } from '@/hooks/useMirroringFullscreen'
 import { useMonitoringTouch } from '@/hooks/useMirroringTouch'
 import { useMirroringWebSocket } from '@/hooks/useMirroringWebSocket'
-import type { KeyCommandValue, MirroringCanvasProps } from '@/types/mirroring'
-import { KeyCommand, MessageType } from '@/types/mirroring'
+import type { BitRateValue, FPSValue, KeyCommandValue, MirroringCanvasProps, ScreenResolutionValue } from '@/types/mirroring'
+import { BitRate, FPS, KeyCommand, MessageType, ScreenResolution } from '@/types/mirroring'
+import MirroringConfig from "@/components/Mirroring/MirroringConfig"
 
 const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
     device
@@ -22,8 +22,13 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
     const [isVideoReady, setIsVideoReady] = useState(false)
     const [isDisconnecting, setIsDisconnecting] = useState(false)
     const [countdown, setCountdown] = useState(0)
+    const [screenResolution, setScreenResolution] = useState<ScreenResolutionValue>(ScreenResolution[1080])
+    const [bitrate, setBitrate] = useState<BitRateValue>(BitRate[8])
+    const [fps, setFps] = useState<FPSValue>(FPS[30])
 
-    const handleVideoFrame = useCallback((frameData: ArrayBuffer) => {
+
+
+    const handleVideoFrame = (frameData: ArrayBuffer) => {
         if (jmuxerRef.current) {
             try {
                 const uint8Array = new Uint8Array(frameData)
@@ -34,19 +39,18 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
                 console.error('Error feeding video data to JMuxer:', error)
             }
         }
-    }, [])
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleConnected = useCallback((data: any) => {
-        console.log('Mirroring connected:', data)
+    const handleConnected = (data: any) => {
+        toast.success('Mirroring server connected')
         setIsVideoReady(true)
+    }
 
-    }, [])
-
-    const handleError = useCallback((error: string) => {
-        console.error('Mirroring error:', error)
+    const handleError = (error: string) => {
+        toast.error(`Mirroring error: ${error}`)
         setIsVideoReady(false)
-    }, [])
+    }
 
     const {
         isConnected,
@@ -71,16 +75,16 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
         }
     }, [wsError])
 
-    const handleKeyCommand = useCallback((key: KeyCommandValue) => {
+    const handleKeyCommand = (key: KeyCommandValue) => {
         if (isConnected && Object.values(KeyCommand).includes(key)) {
             sendKeyEvent({
                 type: MessageType.KEY,
                 key: key
             })
         }
-    }, [isConnected, sendKeyEvent])
+    }
 
-    const handleDisconnect = useCallback(() => {
+    const handleDisconnect = () => {
         disconnect()
         setIsDisconnecting(true)
         setCountdown(5)
@@ -95,13 +99,13 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
                 return prev - 1
             })
         }, 1000)
-    }, [disconnect])
+    }
 
-    const handleConnect = useCallback(() => {
+    const handleConnect = () => {
         if (!isDisconnecting) {
             connect()
         }
-    }, [connect, isDisconnecting])
+    }
 
     useMonitoringTouch({
         canvasRef: canvasRef as React.RefObject<HTMLCanvasElement>,
@@ -193,33 +197,18 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
 
     if (!isConnected) {
         return (
-            <div className="flex items-center justify-center bg-opacity-50 h-[300px] z-20">
-                <div className="text-center">
-                    <FaChromecast className='m-auto text-6xl md:text-9xl' />
-
-                    <button
-                        onClick={handleConnect}
-                        disabled={isDisconnecting}
-                        className={`btn ${isDisconnecting ? 'btn-disabled' : 'btn-success'}`}
-                    >
-                        {isDisconnecting ? (
-                            <span className="flex items-center space-x-2">
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                                <span>Waiting {countdown} second to complete disconnecting</span>
-                            </span>
-                        ) : (
-                            'Connect'
-                        )}
-                    </button>
-                    {
-                        !isConnected && (
-                            <div className='text-warning mt-5'>
-                                <b>NOTE: </b> If you cannot connect after disconnecting or changing devices but still not connecting, please refresh the Andromodem.
-                            </div>
-                        )
-                    }
-                </div>
-            </div>
+            <MirroringConfig
+                screenResolution={screenResolution}
+                setScreenResolution={setScreenResolution}
+                bitrate={bitrate}
+                setBitrate={setBitrate}
+                fps={fps}
+                setFps={setFps}
+                handleConnect={handleConnect}
+                isDisconnecting={isDisconnecting}
+                countdown={countdown}
+                isConnected={isConnected}
+            />
         )
     }
     return (

@@ -5,13 +5,13 @@ import { MdPowerSettingsNew } from "react-icons/md"
 import { RiHomeLine } from "react-icons/ri"
 import { TbBoxMultiple } from "react-icons/tb"
 
-import { KeyCommand } from "@/types/mirroring"
+import { KeyCommand, type KeyCommandValue } from "@/types/mirroring"
 
 interface MirroringNavigationProps {
     isConnected: boolean
     isFullscreen: boolean
     onToggleFullscreen: () => void
-    onSendKeyCommand?: (key: KeyCommand) => void
+    onSendKeyCommand?: (key: KeyCommandValue) => void
 }
 
 const MirroringNavigation: FC<MirroringNavigationProps> = ({
@@ -20,7 +20,7 @@ const MirroringNavigation: FC<MirroringNavigationProps> = ({
     onToggleFullscreen,
     onSendKeyCommand
 }) => {
-    const handleKeyPress = (key: KeyCommand) => {
+    const handleKeyPress = (key: KeyCommandValue) => {
         if (isConnected && onSendKeyCommand) {
             onSendKeyCommand(key)
         }

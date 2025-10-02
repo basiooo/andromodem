@@ -1,4 +1,4 @@
-import { useCallback, useEffect,useRef, useState } from 'react'
+import { useEffect,useRef, useState } from 'react'
 
 interface useMirroringFullscreenReturn {
   isFullscreen: boolean;
@@ -22,7 +22,7 @@ export const useMirroringFullscreen = (): useMirroringFullscreenReturn => {
     }
   }, [])
 
-  const enterFullscreen = useCallback(async (): Promise<void> => {
+  const enterFullscreen = async (): Promise<void> => {
     if (!elementRef.current) return
     
     try {
@@ -32,9 +32,9 @@ export const useMirroringFullscreen = (): useMirroringFullscreenReturn => {
     } catch (error) {
       console.error('Error entering fullscreen:', error)
     }
-  }, [])
+  }
 
-  const exitFullscreen = useCallback(async (): Promise<void> => {
+  const exitFullscreen = async (): Promise<void> => {
     try {
       if (document.fullscreenElement && document.exitFullscreen) {
         await document.exitFullscreen()
@@ -42,19 +42,19 @@ export const useMirroringFullscreen = (): useMirroringFullscreenReturn => {
     } catch (error) {
       console.error('Error exiting fullscreen:', error)
     }
-  }, [])
+  }
 
-  const toggleFullscreen = useCallback(async (): Promise<void> => {
+  const toggleFullscreen = async (): Promise<void> => {
     if (isFullscreen) {
       await exitFullscreen()
     } else {
       await enterFullscreen()
     }
-  }, [isFullscreen, enterFullscreen, exitFullscreen])
+  }
 
-  const setFullscreenElement = useCallback((element: HTMLElement | null) => {
+  const setFullscreenElement = (element: HTMLElement | null) => {
     elementRef.current = element
-  }, [])
+  }
 
   return {
     isFullscreen,

@@ -1,4 +1,4 @@
-import { useCallback,useEffect } from 'react'
+import { useEffect } from 'react'
 
 interface UseAspectRatioProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -12,7 +12,7 @@ export const useAspectRatio = ({
   screenHeight 
 }: UseAspectRatioProps) => {
   
-  const updateAspectRatio = useCallback(() => {
+  const updateAspectRatio = () => {
     if (!canvasRef.current || !screenWidth || !screenHeight) return
     
     const canvas = canvasRef.current
@@ -22,7 +22,7 @@ export const useAspectRatio = ({
       const aspectRatio = screenWidth / screenHeight
       container.style.aspectRatio = aspectRatio.toString()
     }
-  }, [canvasRef, screenWidth, screenHeight])
+  }
 
   useEffect(() => {
     updateAspectRatio()

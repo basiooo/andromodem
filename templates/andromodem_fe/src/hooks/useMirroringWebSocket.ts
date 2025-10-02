@@ -1,9 +1,10 @@
-import { useCallback,useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { config } from '@/config'
 import { DeviceState } from '@/types/device'
 import type { 
   ConnectedMessage, 
+  ConnectionStateValue, 
   KeyMessage,
   TouchMessage,
   UseMirroringWebSocketOptions, 
@@ -17,7 +18,7 @@ const PING_INTERVAL = 5000
 export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): UseMirroringWebSocketReturn =>  {
   const { device, onConnected, onError, onVideoFrame } = options
   
-  const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED)
+  const [connectionState, setConnectionState] = useState<ConnectionStateValue>(ConnectionState.DISCONNECTED)
   const [error, setError] = useState<string | null>(null)
   const [screenDimensions, setScreenDimensions] = useState<{ width: number; height: number } | null>(null)
   
@@ -28,23 +29,23 @@ export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): Us
   const isConnected = connectionState === ConnectionState.CONNECTED
   const isConnecting = connectionState === ConnectionState.CONNECTING
   
-  const clearTimeouts = useCallback(() => {
+  const clearTimeouts = () => {
     if (pingIntervalRef.current) {
       clearInterval(pingIntervalRef.current)
       pingIntervalRef.current = null
     }
-  }, [])
+  }
   
-  const setupPingInterval = useCallback(() => {
+  const setupPingInterval = () => {
     clearTimeouts()
     pingIntervalRef.current = setInterval(() => {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         wsRef.current.send(JSON.stringify({ type: 'ping' }))
       }
     }, PING_INTERVAL)
-  }, [clearTimeouts])
+  }
   
-  const handleMessage = useCallback((event: MessageEvent) => {
+  const handleMessage = (event: MessageEvent) => {
     if (event.data instanceof ArrayBuffer) {
       onVideoFrame?.(event.data)
       return
@@ -55,7 +56,6 @@ export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): Us
       
       switch (message.type) {
         case MessageType.CONNECTED:
-          // eslint-disable-next-line no-case-declarations
           const connectedMsg = message as ConnectedMessage
           setConnectionState(ConnectionState.CONNECTED)
           setError(null)
@@ -80,22 +80,22 @@ export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): Us
       console.error('Failed to parse WebSocket message:', err)
       setError('Failed to parse server message')
     }
-  }, [onConnected, onError, onVideoFrame, setupPingInterval])
+  }
   
-  const handleError = useCallback((event: Event) => {
+  const handleError = (event: Event) => {
     console.error('WebSocket error:', event)
     setError('WebSocket connection error')
     setConnectionState(ConnectionState.ERROR)
     onError?.('WebSocket connection error')
-  }, [onError])
+  }
   
-  const handleClose = useCallback((event: CloseEvent) => {
+  const handleClose = (event: CloseEvent) => {
     console.log('WebSocket closed:', event.code, event.reason)
     setConnectionState(ConnectionState.DISCONNECTED)
     clearTimeouts()
-  }, [clearTimeouts])
+  }
   
-  const connect = useCallback(() => {
+  const connect = () => {
     if (device.state !== DeviceState.ONLINE || wsRef.current?.readyState === WebSocket.OPEN) {
       return
     }
@@ -122,9 +122,9 @@ export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): Us
       setError('Failed to create WebSocket connection')
       setConnectionState(ConnectionState.ERROR)
     }
-  }, [device, handleMessage, handleError, handleClose])
+  }
   
-  const disconnect = useCallback(() => {
+  const disconnect = () => {
     isManualDisconnectRef.current = true
     clearTimeouts()
     
@@ -135,9 +135,9 @@ export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): Us
     setConnectionState(ConnectionState.DISCONNECTED)
     setError(null)
     setScreenDimensions(null)
-  }, [clearTimeouts])
+  }
   
-  const sendTouchEvent = useCallback((event: TouchMessage) => {
+  const sendTouchEvent = (event: TouchMessage) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
       console.warn('WebSocket not connected, cannot send touch event')
       return
@@ -154,9 +154,9 @@ export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): Us
       console.error('Failed to send touch event:', err)
       setError('Failed to send touch event')
     }
-  }, [])
+  }
 
-  const sendKeyEvent = useCallback((event: KeyMessage) => {
+  const sendKeyEvent = (event: KeyMessage) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
       console.warn('WebSocket not connected, cannot send key event')
       return
@@ -175,13 +175,13 @@ export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): Us
       console.error('Failed to send key event:', err)
       setError('Failed to send key event')
     }
-  }, [])
+  }
   
   useEffect(() => {
     return () => {
       disconnect()
     }
-  }, [disconnect])
+  }, [])
   
   return {
     isConnected,

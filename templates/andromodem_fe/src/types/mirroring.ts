@@ -106,3 +106,31 @@ export interface RelativeCoordinates {
   x: number;
   y: number;
 }
+
+export const ScreenResolution = {
+  144: 144,
+  240: 240,
+  320: 320,
+  480: 480,
+  720: 720,
+  1080: 1080,
+} as const
+export type ScreenResolutionValue = typeof ScreenResolution[keyof typeof ScreenResolution];
+
+export const BitRate = {
+  1: 1000,
+  2: 2000,
+  3: 3000,
+  4: 4000,
+  5: 5000,
+  6: 6000,
+  7: 7000,
+  8: 8000,
+} as const
+export type BitRateValue = typeof BitRate[keyof typeof BitRate];
+
+export const FPS = {
+  30: 30,
+  60: 60,
+} as const
+export type FPSValue = typeof FPS[keyof typeof FPS];
