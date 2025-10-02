@@ -9,7 +9,7 @@ import { useAspectRatio } from '@/hooks/useMirroringAspectRatio'
 import { useMirroringFullscreen } from '@/hooks/useMirroringFullscreen'
 import { useMonitoringTouch } from '@/hooks/useMirroringTouch'
 import { useMirroringWebSocket } from '@/hooks/useMirroringWebSocket'
-import type { MirroringCanvasProps } from '@/types/mirroring'
+import type { KeyCommandValue, MirroringCanvasProps } from '@/types/mirroring'
 import { KeyCommand, MessageType } from '@/types/mirroring'
 
 const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
@@ -71,7 +71,7 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
         }
     }, [wsError])
 
-    const handleKeyCommand = useCallback((key: KeyCommand) => {
+    const handleKeyCommand = useCallback((key: KeyCommandValue) => {
         if (isConnected && Object.values(KeyCommand).includes(key)) {
             sendKeyEvent({
                 type: MessageType.KEY,

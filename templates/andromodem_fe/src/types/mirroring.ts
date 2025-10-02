@@ -7,7 +7,7 @@ export const TouchAction = {
   CANCEL: "cancel"
 } as const
 
-export type TouchAction = typeof TouchAction[keyof typeof TouchAction];
+export type TouchActionValue = typeof TouchAction[keyof typeof TouchAction];
 
 export const KeyCommand = {
   BACK: "back",
@@ -16,7 +16,7 @@ export const KeyCommand = {
   POWER: "power"
 } as const
 
-export type KeyCommand = typeof KeyCommand[keyof typeof KeyCommand];
+export type KeyCommandValue = typeof KeyCommand[keyof typeof KeyCommand];
 
 export const MessageType = {
   TOUCH: "touch",
@@ -25,7 +25,7 @@ export const MessageType = {
   ERROR: "error"
 } as const
 
-export type MessageType = typeof MessageType[keyof typeof MessageType];
+export type MessageTypeValue = typeof MessageType[keyof typeof MessageType];
 
 export const ConnectionState = {
   DISCONNECTED: "disconnected",
@@ -34,11 +34,11 @@ export const ConnectionState = {
   ERROR: "error"
 } as const
 
-export type ConnectionState = typeof ConnectionState[keyof typeof ConnectionState];
+export type ConnectionStateValue = typeof ConnectionState[keyof typeof ConnectionState];
 
 export interface TouchMessage {
   type: typeof MessageType.TOUCH;
-  action: TouchAction;
+  action: TouchActionValue;
   x: number; 
   y: number;
   pointerId: number;
@@ -47,7 +47,7 @@ export interface TouchMessage {
 
 export interface KeyMessage {
   type: typeof MessageType.KEY;
-  key: KeyCommand;
+  key: KeyCommandValue;
 }
 
 export interface ConnectedMessage {
