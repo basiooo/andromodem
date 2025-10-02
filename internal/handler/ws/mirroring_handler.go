@@ -2,7 +2,6 @@ package ws
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"sync"
 	"time"
@@ -35,7 +34,6 @@ func NewMirroringHandler(mirroringService mirroring_service.IMirroringService, l
 		},
 		Logger:      logger,
 		activeConns: make(map[string]*websocket.Conn),
-		Validator:   validator,
 	}
 }
 
@@ -94,35 +92,26 @@ func (h *MirroringHandler) StartMirroringStream(w http.ResponseWriter, r *http.R
 		zap.String("serial", serial),
 	)
 
-	setupReceived := make(chan *model.MirroringSetupRequest, 1)
-
-	go h.handleWebSocketMessages(ctx, cancel, conn, serial, setupReceived)
-
-	var setup *model.MirroringSetupRequest
-	select {
-	case setup = <-setupReceived:
-		if !h.MirroringService.IsRunning(serial) {
-			client, err = h.MirroringService.StartMirroring(ctx, serial, setup)
-			if err != nil {
-				h.Logger.Error("failed to start mirroring",
+	if !h.MirroringService.IsRunning(serial) {
+		var setup model.MirroringSetupRequest
+		client, err = h.MirroringService.StartMirroring(ctx, serial, &setup)
+		if err != nil {
+			h.Logger.Error("failed to start mirroring",
+				zap.String("serial", serial),
+				zap.Error(err),
+			)
+			errorMsg := map[string]interface{}{
+				"type":    "error",
+				"message": "Failed to start mirroring: " + err.Error(),
+			}
+			if err := conn.WriteJSON(errorMsg); err != nil {
+				h.Logger.Error("failed to send error message",
 					zap.String("serial", serial),
 					zap.Error(err),
 				)
-				errorMsg := map[string]interface{}{
-					"type":    "error",
-					"message": "Failed to start mirroring: " + err.Error(),
-				}
-				if err := conn.WriteJSON(errorMsg); err != nil {
-					h.Logger.Error("failed to send error message",
-						zap.String("serial", serial),
-						zap.Error(err),
-					)
-				}
-				return
 			}
+			return
 		}
-	case <-ctx.Done():
-		return
 	}
 
 	successMsg := map[string]interface{}{
@@ -143,6 +132,7 @@ func (h *MirroringHandler) StartMirroringStream(w http.ResponseWriter, r *http.R
 	pingTicker := time.NewTicker(30 * time.Second)
 	defer pingTicker.Stop()
 
+	go h.handleWebSocketControl(ctx, cancel, conn, serial)
 	handleVideoChunk := func(chunk []byte) {
 		if len(chunk) == 0 {
 			return
@@ -197,93 +187,38 @@ func (h *MirroringHandler) StartMirroringStream(w http.ResponseWriter, r *http.R
 	}
 }
 
-func (h *MirroringHandler) handleWebSocketMessages(ctx context.Context, cancelCtx context.CancelFunc, conn *websocket.Conn, serial string, setupChan chan<- *model.MirroringSetupRequest) {
+func (h *MirroringHandler) handleWebSocketControl(ctx context.Context, cancelCtx context.CancelFunc, conn *websocket.Conn, serial string) {
 	conn.SetReadLimit(1024)
 
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			_, messageBytes, err := conn.ReadMessage()
-			if err != nil {
-				h.Logger.Info("client disconnected",
-					zap.String("serial", serial),
-					zap.Error(err),
-				)
-				cancelCtx()
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
 				return
-			}
-
-			if len(messageBytes) > 1024 {
-				h.Logger.Warn("received oversized message, ignoring",
-					zap.String("serial", serial),
-					zap.Int("size", len(messageBytes)),
-				)
-				continue
-			}
-
-			if len(messageBytes) > 0 {
-				var message map[string]interface{}
-				if err := json.Unmarshal(messageBytes, &message); err == nil {
-					if msgType, ok := message["type"].(string); ok && msgType == "setup" {
-						var setupRequest model.MirroringSetupRequest
-						if err := json.Unmarshal(messageBytes, &setupRequest); err != nil {
-							h.Logger.Error("failed to parse setup message",
-								zap.String("serial", serial),
-								zap.Error(err),
-							)
-							errorMsg := map[string]interface{}{
-								"type":    "error",
-								"message": "Invalid setup message format",
-							}
-							if err := conn.WriteJSON(errorMsg); err != nil {
-								h.Logger.Error("failed to send error message",
-									zap.String("serial", serial),
-									zap.Error(err),
-								)
-							}
-							continue
-						}
-
-						if err := h.Validator.Struct(&setupRequest); err != nil {
-							h.Logger.Error("setup validation failed",
-								zap.String("serial", serial),
-								zap.Error(err),
-							)
-							errorMsg := map[string]interface{}{
-								"type":    "error",
-								"message": "Setup validation failed: " + err.Error(),
-							}
-							if err := conn.WriteJSON(errorMsg); err != nil {
-								h.Logger.Error("failed to send validation error message",
-									zap.String("serial", serial),
-									zap.Error(err),
-								)
-							}
-							continue
-						}
-
-						h.Logger.Info("received valid setup configuration",
-							zap.String("serial", serial),
-							zap.Uint8("fps", setupRequest.FPS),
-							zap.Uint32("bitrate", setupRequest.Bitrate),
-							zap.Uint16("resolution", setupRequest.Resolution),
-						)
-
-						select {
-						case setupChan <- &setupRequest:
-						default:
-							h.Logger.Warn("setup channel full, ignoring duplicate setup message",
-								zap.String("serial", serial),
-							)
-						}
-						continue
-					}
+			default:
+				_, messageBytes, err := conn.ReadMessage()
+				if err != nil {
+					h.Logger.Info("client disconnected",
+						zap.String("serial", serial),
+						zap.Error(err),
+					)
+					cancelCtx()
+					return
 				}
 
-				h.MirroringService.HandleControlMessage(serial, messageBytes)
+				if len(messageBytes) > 1024 {
+					h.Logger.Warn("received oversized message, ignoring",
+						zap.String("serial", serial),
+						zap.Int("size", len(messageBytes)),
+					)
+					continue
+				}
+
+				if len(messageBytes) > 0 {
+					h.MirroringService.HandleControlMessage(serial, messageBytes)
+				}
 			}
 		}
-	}
+	}()
+
 }
