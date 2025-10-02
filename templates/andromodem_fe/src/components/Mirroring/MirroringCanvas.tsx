@@ -2,6 +2,7 @@ import JMuxer from 'jmuxer'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 
+import MirroringConfig from "@/components/Mirroring/MirroringConfig"
 import MirroringNavigation from '@/components/Mirroring/MirroringNavigation'
 import MirroringTool from '@/components/Mirroring/MirroringTool'
 import { useAspectRatio } from '@/hooks/useMirroringAspectRatio'
@@ -10,7 +11,6 @@ import { useMonitoringTouch } from '@/hooks/useMirroringTouch'
 import { useMirroringWebSocket } from '@/hooks/useMirroringWebSocket'
 import type { BitRateValue, FPSValue, KeyCommandValue, MirroringCanvasProps, ScreenResolutionValue } from '@/types/mirroring'
 import { BitRate, FPS, KeyCommand, MessageType, ScreenResolution } from '@/types/mirroring'
-import MirroringConfig from "@/components/Mirroring/MirroringConfig"
 
 const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
     device
@@ -41,7 +41,7 @@ const MirroringCanvas: React.FC<MirroringCanvasProps> = ({
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const handleConnected = () => {
         toast.success('Mirroring server connected')
         setIsVideoReady(true)

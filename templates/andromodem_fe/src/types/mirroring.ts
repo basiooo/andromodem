@@ -120,7 +120,7 @@ export const ScreenResolution = {
   360: 360,
   480: 480,
   720: 720,
-  1080: 1080,
+  1080: 1080
 } as const
 export type ScreenResolutionValue = typeof ScreenResolution[keyof typeof ScreenResolution];
 
@@ -132,12 +132,12 @@ export const BitRate = {
   5: 5000000,
   6: 6000000,
   7: 7000000,
-  8: 8000000,
+  8: 8000000
 } as const
 export type BitRateValue = typeof BitRate[keyof typeof BitRate];
 
 export const FPS = {
   30: 30,
-  60: 60,
+  60: 60
 } as const
 export type FPSValue = typeof FPS[keyof typeof FPS];

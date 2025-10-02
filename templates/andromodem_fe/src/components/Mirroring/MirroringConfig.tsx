@@ -1,12 +1,12 @@
 import type { FC } from "react"
+
 import {
-    ScreenResolution,
-    type ScreenResolutionValue,
     BitRate,
     type BitRateValue,
     FPS,
-    type FPSValue
-} from "@/types/mirroring"
+    type FPSValue,
+    ScreenResolution,
+    type ScreenResolutionValue} from "@/types/mirroring"
 
 type MirroringConfigProps = {
     screenResolution: ScreenResolutionValue

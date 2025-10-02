@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useCallback,useEffect, useRef, useState } from 'react'
 
 import { config } from '@/config'
 import { DeviceState } from '@/types/device'
@@ -54,10 +54,9 @@ export const useMirroringWebSocket = (options: UseMirroringWebSocketOptions): Us
     
     try {
       const message: WebSocketMessage = JSON.parse(event.data)
-      
+      const connectedMsg = message as ConnectedMessage
       switch (message.type) {
         case MessageType.CONNECTED:
-          const connectedMsg = message as ConnectedMessage
           setConnectionState(ConnectionState.CONNECTED)
           setError(null)
           setScreenDimensions({ 
