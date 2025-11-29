@@ -78,19 +78,24 @@ install_dependencies() {
 download_binary() {
     version="$1"
     os_arch=$(get_os_arch)
-    api_url="https://api.github.com/repos/basiooo/andromodem/releases/tags/v${version}"
+    download_url="https://github.com/basiooo/andromodem/releases/download/v${version}/andromodem_v${version}_linux_${os_arch}"
 
-    echo "🔍 Checking release assets via GitHub API..."
-    asset_url=$(wget -qO- "$api_url" | grep "browser_download_url" | grep "$os_arch" | cut -d '"' -f 4)
+    content_length=$(wget --spider --server-response "$download_url" 2>&1 \
+        | awk '/Content-Length/ {print $2}' \
+        | tr -d '\r')
 
-    if [ -z "$asset_url" ]; then
-        echo "❌ No asset found for architecture $os_arch in version v$version. url: $api_url"
+    echo "⬇️  Downloading binary from: $download_url"
+
+    if [ -z "$content_length" ] || [ "$content_length" -lt 1000 ]; then
+        echo "❌ Download failed: invalid Content-Length ($content_length bytes)"
+        echo "Please try again. If the problem persists, create an issue on GitHub:"
+        echo "➡️  https://github.com/basiooo/andromodem/issues"
         exit 1
     fi
 
-    echo "⬇️  Downloading binary from: $asset_url"
-    if wget -O "$BIN_PATH" "$asset_url"; then
+    if wget -O "$BIN_PATH" "$download_url"; then
         chmod +x "$BIN_PATH"
+        echo "✅ Binary downloaded & executable."
     else
         echo "❌ Failed to download binary."
         exit 1
