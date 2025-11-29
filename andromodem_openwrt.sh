@@ -78,7 +78,7 @@ install_dependencies() {
 download_binary() {
     version="$1"
     os_arch=$(get_os_arch)
-    download_url="https://github.com/basiooo/andromodem/releases/download/v${version}/andromodem_v${version}_linux_${os_arch}"
+    download_url="https://github.com/basiooo/andromodem/releases/download/v${version}/andromodem_v${version}_${os_arch}"
 
     content_length=$(wget --spider --server-response "$download_url" 2>&1 \
         | awk '/Content-Length/ {print $2}' \
