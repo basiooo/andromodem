@@ -79,7 +79,7 @@ download_binary() {
     version="$1"
     os_arch=$(get_os_arch)
     download_url="https://github.com/basiooo/andromodem/releases/download/v${version}/andromodem_v${version}_${os_arch}"
-
+    echo "Download URL: ${download_url}"
     if wget -O "$BIN_PATH" "$download_url"; then
         chmod +x "$BIN_PATH"
         echo "✅ Binary downloaded & executable."
