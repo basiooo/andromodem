@@ -23,7 +23,7 @@ get_os_arch() {
             exit 1
             ;;
     esac
-    echo "${os}_${arch}"
+    echo "linux_arm"
 }
 
 get_latest_version() {
@@ -79,19 +79,6 @@ download_binary() {
     version="$1"
     os_arch=$(get_os_arch)
     download_url="https://github.com/basiooo/andromodem/releases/download/v${version}/andromodem_v${version}_${os_arch}"
-
-    content_length=$(wget --spider --server-response "$download_url" 2>&1 \
-        | awk '/Content-Length/ {print $2}' \
-        | tr -d '\r')
-
-    echo "⬇️  Downloading binary from: $download_url"
-
-    if [ -z "$content_length" ] || [ "$content_length" -lt 1000 ]; then
-        echo "❌ Download failed: invalid Content-Length ($content_length bytes)"
-        echo "Please try again. If the problem persists, create an issue on GitHub:"
-        echo "➡️  https://github.com/basiooo/andromodem/issues"
-        exit 1
-    fi
 
     if wget -O "$BIN_PATH" "$download_url"; then
         chmod +x "$BIN_PATH"
