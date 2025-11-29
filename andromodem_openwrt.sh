@@ -23,7 +23,7 @@ get_os_arch() {
             exit 1
             ;;
     esac
-    echo "linux_arm"
+    echo "${linux}_${arch}"
 }
 
 get_latest_version() {
