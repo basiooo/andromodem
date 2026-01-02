@@ -43,7 +43,7 @@ define Build/Compile
 		$(if $(findstring mips,$(GO_ARCH)),GOMIPS=$(or $(GO_MIPS),softfloat)) \
 		CGO_ENABLED=0 \
 		go build -v -trimpath -ldflags="-s -w -X main.version=$(PKG_VERSION)" \
-		-o $(PKG_BUILD_DIR)/andromodem .
+		-o $(PKG_BUILD_DIR)/andromodem ./cmd/andromodem
 endef
 
 define Package/andromodem/install
