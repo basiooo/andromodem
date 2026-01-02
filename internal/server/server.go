@@ -24,10 +24,10 @@ type httpServer struct {
 	ctxCancel context.CancelFunc
 }
 
-func NewServer(router http.Handler, log *zap.Logger, ctx context.Context, ctxCancel context.CancelFunc) Server {
+func NewServer(router http.Handler, log *zap.Logger, ctx context.Context, ctxCancel context.CancelFunc, port int) Server {
 	return &httpServer{
 		server: &http.Server{
-			Addr:    "0.0.0.0:49153",
+			Addr:    fmt.Sprintf("0.0.0.0:%d", port),
 			Handler: router,
 		},
 		ctx:       ctx,
