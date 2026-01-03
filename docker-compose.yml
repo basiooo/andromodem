@@ -1,0 +1,27 @@
+services:
+  openwrt-builder:
+    image: openwrt/sdk:x86_64-v24.10.5
+    container_name: andromodem-openwrt-sdk
+    volumes:
+      - ./andromodem:/builder/package/andromodem:ro
+      - ./luci-app-andromodem:/builder/package/luci-app-andromodem:ro
+      - openwrt-dl:/builder/dl
+      - openwrt-build:/builder/build_dir
+      - openwrt-staging:/builder/staging_dir
+      - ./openwrt-build:/output
+    
+    working_dir: /builder
+    user: buildbot
+    
+    tty: true
+    stdin_open: true
+    
+    command: /bin/bash
+
+volumes:
+  openwrt-dl:
+    driver: local
+  openwrt-build:
+    driver: local
+  openwrt-staging:
+    driver: local
