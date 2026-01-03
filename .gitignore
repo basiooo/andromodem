@@ -1,52 +1,160 @@
+*.DS_Store
+.AppleDouble
+.LSOverride
+._*
 
-# If you prefer the allow list template instead of the deny list, see community template:
-# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
-# Binaries for programs and plugins
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+.directory
+.dropbox
+.dropbox.attr
+
+*.log
+*.log.*
+*.sql
+*.sqlite
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
 *.exe
-*.exe~
 *.dll
 *.so
 *.dylib
+*.bak
+*.swp
+*~
+*.tmp
 
-# Test binary, built with `go test -c`
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+bin/
+pkg/
 *.test
+*.prof
 
-# log file
-*.log
+## Rust
+target/
+*.rs.bk
 
-# Code coverage profiles and other test artifacts
+build/
+*.o
+*.obj
 *.out
-coverage.*
-*.coverprofile
-profile.cov
+*.a
+*.lib
+*.pdb
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+dependency-reduced-pom.xml
+release.properties
+tomcat*/
+*.class
 
-# Go workspace file
-go.work
-go.work.sum
+bin/
+obj/
+*.user
+*.suo
+*.csproj.bak
+*.cache
+*.ilk
+*.meta
+*.ncx
+*.nupkg
 
-# env file
-.env
+_build/
+deps/
+*.ez
 
-# Editor/IDE
+.Rhistory
+.RData
+.Rproj.user/
+*.Rout
+
+node_modules/
+dist/
+build/
+*.min.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tsbuildinfo
+
+DerivedData/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+*.xcworkspace
+Pods/
+
+.gradle/
+build/
+*.apk
+*.ap_
+*.aab
+local.properties
+*.idea/
+*.iml
+
 .idea/
+*.iml
 .vscode/
-.trae/
-.cursor/
+*.swp
+*.swo
+nbproject/
+*.code-workspace
 
-
-# temp file
-temp/
-
-main
-
-andromodem.log
-
+.env
+.env.local
+.env.*.local
+*.cache
+*.lock
+*.pid
+/main
 andromodem_logs/
+/tmp
 
-andromodem_monitoring_config.json
-
-.DS_Store
+# OpenWrt Build System
+openwrt-build/
+.config
+.config.old
+*.ipk
+*.manifest
+/dl/
+/build_dir/
+/staging_dir/
+/bin/
+/logs/
+/feeds/
+/.ccache/
