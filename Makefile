@@ -22,9 +22,26 @@ BIN_AMD64:=andromodem-linux-amd64
 BIN_ARM64:=andromodem-linux-arm64
 BIN_ARMHF:=andromodem-linux-armv7
 
-.PHONY: all clean build-core build-binaries deb-amd64 deb-arm64 deb-armhf arch-x86_64 arch-aarch64 arch-armv7h build-all build-deb build-arch
+.PHONY: all clean build-core build-binaries build-frontend deb-amd64 deb-arm64 deb-armhf arch-x86_64 arch-aarch64 arch-armv7h build-all build-deb build-arch dev
 
-all: build-binaries build-deb build-arch
+all: build-frontend build-binaries build-deb build-arch
+
+# Frontend build target
+build-frontend:
+	@echo "Building frontend..."
+	@if [ ! -d "templates/andromodem_fe/node_modules" ]; then \
+		echo "Installing frontend dependencies..."; \
+		cd templates/andromodem_fe && npm install; \
+	fi
+	@echo "Building React frontend..."
+	cd templates/andromodem_fe && npm run build
+	@echo "Frontend built successfully!"
+
+# Development target - run with Air for hot-reload
+dev:
+	@echo "Starting AndroModem in development mode with Air..."
+	@command -v air > /dev/null 2>&1 || { echo "Air is not installed. Installing..."; go install github.com/air-verse/air@latest; }
+	air
 
 build-deb: deb-amd64 deb-arm64 deb-armhf
 
@@ -32,7 +49,7 @@ build-arch: arch-x86_64 arch-aarch64 arch-armv7h
 
 build-all: all
 
-build-binaries:
+build-binaries: build-frontend
 	@echo "Building standalone binaries for multiple platforms..."
 	mkdir -p bin
 	
@@ -101,9 +118,19 @@ build-binaries:
 		go build -v -trimpath -ldflags="-s -w -X main.Version=$(PKG_VERSION)" \
 		-o bin/andromodem-android-arm64 ./cmd/andromodem
 	
+	@echo "Building for darwin/amd64 (macOS Intel)..."
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 \
+		go build -v -trimpath -ldflags="-s -w -X main.Version=$(PKG_VERSION)" \
+		-o bin/andromodem-darwin-amd64 ./cmd/andromodem
+	
+	@echo "Building for darwin/arm64 (macOS Apple Silicon)..."
+	GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 \
+		go build -v -trimpath -ldflags="-s -w -X main.Version=$(PKG_VERSION)" \
+		-o bin/andromodem-darwin-arm64 ./cmd/andromodem
+	
 	@echo "All binaries built successfully in bin/"
 
-build-core:
+build-core: build-frontend
 	@echo "Building AndroModem binaries from source..."
 	mkdir -p $(CORE_DIR)
 	
@@ -128,6 +155,8 @@ clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf $(CORE_DIR)
 	rm -rf bin
+	rm -rf templates/andromodem_fe/dist/*
+	@echo "Cleaned build artifacts and frontend dist"
 
 # Template for building Debian package
 # Usage: $(call build_deb, ARCH, ANDROMODEM_BINARY)
