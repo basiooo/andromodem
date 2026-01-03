@@ -14,7 +14,7 @@ PKG_HASH:=skip
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 
-PKG_BUILD_DEPENDS:=golang/host
+PKG_BUILD_DEPENDS:=node/host golang/host
 
 include $(INCLUDE_DIR)/package.mk
 include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk
@@ -26,7 +26,7 @@ define Package/andromodem
   CATEGORY:=Network
   TITLE:=AndroModem - Android Modem Manager
   URL:=https://github.com/basiooo/andromodem
-  DEPENDS:=+adb
+  DEPENDS:=+adb +ca-bundle
 endef
 
 define Package/andromodem/description
@@ -35,6 +35,14 @@ define Package/andromodem/description
 endef
 
 define Build/Compile
+	@echo "Building React frontend..."
+	cd $(PKG_BUILD_DIR)/templates/andromodem_fe && \
+		npm install && \
+		npm run build
+
+	@echo "Preparing static files..."
+	chmod -R 755 $(PKG_BUILD_DIR)/templates/andromodem_fe/dist
+
 	@echo "Compiling AndroModem Go binary..."
 	cd $(PKG_BUILD_DIR) && \
 		GOOS=linux \
@@ -42,7 +50,7 @@ define Build/Compile
 		$(if $(findstring arm,$(GO_ARCH)),GOARM=$(or $(GO_ARM),7)) \
 		$(if $(findstring mips,$(GO_ARCH)),GOMIPS=$(or $(GO_MIPS),softfloat)) \
 		CGO_ENABLED=0 \
-		go build -v -trimpath -ldflags="-s -w -X main.version=$(PKG_VERSION)" \
+		go build -v -trimpath -ldflags="-s -w -X main.Version=$(PKG_VERSION)" \
 		-o $(PKG_BUILD_DIR)/andromodem ./cmd/andromodem
 endef
 
