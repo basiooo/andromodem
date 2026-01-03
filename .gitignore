@@ -141,3 +141,20 @@ nbproject/
 *.cache
 *.lock
 *.pid
+/main
+andromodem_logs/
+/tmp
+
+# OpenWrt Build System
+openwrt-build/
+.config
+.config.old
+*.ipk
+*.manifest
+/dl/
+/build_dir/
+/staging_dir/
+/bin/
+/logs/
+/feeds/
+/.ccache/
