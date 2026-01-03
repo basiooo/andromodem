@@ -22,6 +22,7 @@ var Version = "dev"
 func main() {
 	versionFlag := flag.Bool("version", false, "Show version information")
 	vFlag := flag.Bool("v", false, "Show version information")
+	portFlag := flag.Int("p", 49153, "Server port (default: 49153)")
 	flag.Parse()
 
 	if *versionFlag || *vFlag {
@@ -61,7 +62,7 @@ func main() {
 	}
 
 	router := router.NewRouter(adbClient, appLogger, ctx, validator)
-	server := server.NewServer(router.GetRouters(), appLogger, ctx, cancel)
+	server := server.NewServer(router.GetRouters(), appLogger, ctx, cancel, *portFlag)
 	if err := server.Start(); err != nil {
 		fmt.Println(err.Error())
 	}

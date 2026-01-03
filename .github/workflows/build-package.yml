@@ -1,0 +1,349 @@
+name: Build AndroModem Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag'
+        required: true
+        default: 'v3.1.1'
+      publish:
+        description: 'Publish to Release?'
+        type: boolean
+        required: true
+        default: true
+      build_debian_arch:
+        description: 'Build Debian/Arch packages?'
+        type: boolean
+        default: true
+      build_openwrt_x86:
+        description: 'Build OpenWrt x86?'
+        type: boolean
+        default: true
+      build_openwrt_arm64:
+        description: 'Build OpenWrt ARM64?'
+        type: boolean
+        default: true
+      build_openwrt_arm32:
+        description: 'Build OpenWrt ARM32?'
+        type: boolean
+        default: true
+      build_openwrt_mips:
+        description: 'Build OpenWrt MIPS?'
+        type: boolean
+        default: true
+  push:
+    branches:
+      - main
+      - dev
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# To disable a specific build job, comment out the entire job section below
+
+jobs:
+  build_packages:
+    if: ${{ github.event_name == 'push' || inputs.build_debian_arch }}
+    name: Build Debian/Ubuntu & Arch Linux Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.25.0
+          cache: true
+
+      - name: Install Dependencies
+        run: sudo apt-get update && sudo apt-get install -y make wget curl unzip tar binutils zstd
+
+      - name: Build All Packages (Debian + Arch + Binaries)
+        run: make all
+
+      - name: Upload Debian Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: andromodem-deb
+          path: build/*.deb
+
+      - name: Upload Arch Linux Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: andromodem-arch
+          path: build/*.pkg.tar.zst
+
+      - name: Upload All Standalone Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: andromodem-binaries
+          path: bin/*
+
+  # Job 1: x86 architectures
+  build_openwrt_x86:
+    if: ${{ github.event_name == 'push' || inputs.build_openwrt_x86 }}
+    permissions:
+      contents: write
+    name: Build OpenWrt x86_${{ matrix.arch }}-${{ matrix.branch }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: [openwrt-24.10, openwrt-25.12]
+        arch:
+          - x86_64
+          - i386_pentium-mmx
+
+    steps:
+      - name: Checkout OpenWrt Branch
+        uses: actions/checkout@v4
+        with:
+          ref: openwrt
+
+      - name: Setup Feed Structure
+        run: |
+          mkdir -p feeds/andromodem feeds/luci-app-andromodem
+          cp -f andromodem/Makefile feeds/andromodem/
+          cp -rf luci-app-andromodem/* feeds/luci-app-andromodem/
+
+      - name: Build Package
+        uses: bobbyunknown/gh-action-sdk@main
+        env:
+          ARCH: ${{ matrix.arch }}-${{ matrix.branch }}
+          FEEDNAME: andromodem
+          PACKAGES: ${{ matrix.arch == 'x86_64' && 'andromodem luci-app-andromodem' || 'andromodem' }}
+          INDEX: 1
+          NO_SHFMT_CHECK: 1
+          KEY_BUILD: ${{ secrets.SIGNING_KEY_SEC }}
+
+      - name: Organize Artifacts
+        run: |
+          mkdir -p output
+          if [[ "${{ matrix.branch }}" == "openwrt-24.10" ]]; then
+            find bin/packages -name "andromodem_*.ipk" -exec cp {} output/ \;
+            find bin/packages -name "luci-app-andromodem_*.ipk" -exec cp {} output/ \;
+          else
+            find bin/packages -name "andromodem-*.apk" ! -name "luci-app-*" -exec sh -c 'cp "$1" "output/andromodem-${{ matrix.arch }}.apk"' sh {} \;
+            find bin/packages -name "luci-app-andromodem-*.apk" -exec cp {} output/ \;
+          fi
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: andromodem-openwrt-${{ matrix.arch }}-${{ matrix.branch }}
+          path: output/*
+
+  # Job 2: ARM64 Cortex-A
+  build_openwrt_arm64:
+    if: ${{ github.event_name == 'push' || inputs.build_openwrt_arm64 }}
+    permissions:
+      contents: write
+    name: Build OpenWrt ARM64_${{ matrix.arch }}-${{ matrix.branch }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: [openwrt-24.10, openwrt-25.12]
+        arch:
+          - aarch64_cortex-a53
+          - aarch64_cortex-a72
+          - aarch64_generic
+
+    steps:
+      - name: Checkout OpenWrt Branch
+        uses: actions/checkout@v4
+        with:
+          ref: openwrt
+
+      - name: Setup Feed Structure
+        run: |
+          mkdir -p feeds/andromodem feeds/luci-app-andromodem
+          cp -f andromodem/Makefile feeds/andromodem/
+          cp -rf luci-app-andromodem/* feeds/luci-app-andromodem/
+
+      - name: Build Package
+        uses: bobbyunknown/gh-action-sdk@main
+        env:
+          ARCH: ${{ matrix.arch }}-${{ matrix.branch }}
+          FEEDNAME: andromodem
+          PACKAGES: andromodem
+          INDEX: 1
+          NO_SHFMT_CHECK: 1
+          KEY_BUILD: ${{ secrets.SIGNING_KEY_SEC }}
+
+      - name: Organize Artifacts
+        run: |
+          mkdir -p output
+          if [[ "${{ matrix.branch }}" == "openwrt-24.10" ]]; then
+            find bin/packages -name "andromodem_*.ipk" -exec cp {} output/ \;
+          else
+            find bin/packages -name "andromodem-*.apk" ! -name "luci-app-*" -exec sh -c 'cp "$1" "output/andromodem-${{ matrix.arch }}.apk"' sh {} \;
+          fi
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: andromodem-openwrt-${{ matrix.arch }}-${{ matrix.branch }}
+          path: output/*
+
+  # Job 3: ARM32 Cortex-A
+  build_openwrt_arm32:
+    if: ${{ github.event_name == 'push' || inputs.build_openwrt_arm32 }}
+    permissions:
+      contents: write
+    name: Build OpenWrt ARM32_${{ matrix.arch }}-${{ matrix.branch }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: [openwrt-24.10, openwrt-25.12]
+        arch:
+          - arm_cortex-a15_neon-vfpv4
+          - arm_cortex-a9
+          - arm_cortex-a7
+
+    steps:
+      - name: Checkout OpenWrt Branch
+        uses: actions/checkout@v4
+        with:
+          ref: openwrt
+
+      - name: Setup Feed Structure
+        run: |
+          mkdir -p feeds/andromodem feeds/luci-app-andromodem
+          cp -f andromodem/Makefile feeds/andromodem/
+          cp -rf luci-app-andromodem/* feeds/luci-app-andromodem/
+
+      - name: Build Package
+        uses: bobbyunknown/gh-action-sdk@main
+        env:
+          ARCH: ${{ matrix.arch }}-${{ matrix.branch }}
+          FEEDNAME: andromodem
+          PACKAGES: andromodem
+          INDEX: 1
+          NO_SHFMT_CHECK: 1
+          KEY_BUILD: ${{ secrets.SIGNING_KEY_SEC }}
+
+      - name: Organize Artifacts
+        run: |
+          mkdir -p output
+          if [[ "${{ matrix.branch }}" == "openwrt-24.10" ]]; then
+            find bin/packages -name "andromodem_*.ipk" -exec cp {} output/ \;
+          else
+            find bin/packages -name "andromodem-*.apk" ! -name "luci-app-*" -exec sh -c 'cp "$1" "output/andromodem-${{ matrix.arch }}.apk"' sh {} \;
+          fi
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: andromodem-openwrt-${{ matrix.arch }}-${{ matrix.branch }}
+          path: output/*
+
+  # Job 4: MIPS
+  build_openwrt_mips:
+    if: ${{ github.event_name == 'push' || inputs.build_openwrt_mips }}
+    permissions:
+      contents: write
+    name: Build OpenWrt MIPS_${{ matrix.arch }}-${{ matrix.branch }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: [openwrt-24.10, openwrt-25.12]
+        arch:
+          - mips_24kc
+          - mipsel_74kc
+
+    steps:
+      - name: Checkout OpenWrt Branch
+        uses: actions/checkout@v4
+        with:
+          ref: openwrt
+
+      - name: Setup Feed Structure
+        run: |
+          mkdir -p feeds/andromodem feeds/luci-app-andromodem
+          cp -f andromodem/Makefile feeds/andromodem/
+          cp -rf luci-app-andromodem/* feeds/luci-app-andromodem/
+
+      - name: Build Package
+        uses: bobbyunknown/gh-action-sdk@main
+        env:
+          ARCH: ${{ matrix.arch }}-${{ matrix.branch }}
+          FEEDNAME: andromodem
+          PACKAGES: andromodem
+          INDEX: 1
+          NO_SHFMT_CHECK: 1
+          KEY_BUILD: ${{ secrets.SIGNING_KEY_SEC }}
+
+      - name: Organize Artifacts
+        run: |
+          mkdir -p output
+          if [[ "${{ matrix.branch }}" == "openwrt-24.10" ]]; then
+            find bin/packages -name "andromodem_*.ipk" -exec cp {} output/ \;
+          else
+            find bin/packages -name "andromodem-*.apk" ! -name "luci-app-*" -exec sh -c 'cp "$1" "output/andromodem-${{ matrix.arch }}.apk"' sh {} \;
+          fi
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: andromodem-openwrt-${{ matrix.arch }}-${{ matrix.branch }}
+          path: output/*
+
+  aggregate_packages:
+    needs: [build_packages, build_openwrt_x86, build_openwrt_arm64, build_openwrt_arm32, build_openwrt_mips]
+    if: ${{ !cancelled() }}
+    name: Aggregate All Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download OpenWrt Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: andromodem-openwrt-*
+          path: downloaded/openwrt
+          merge-multiple: true
+
+      - name: Download Debian Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: andromodem-deb
+          path: downloaded/debian
+
+      - name: Download Arch Linux Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: andromodem-arch
+          path: downloaded/arch
+
+      - name: Download Standalone Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: andromodem-binaries
+          path: downloaded/binaries
+
+      - name: List All Files
+        run: ls -R downloaded
+
+      - name: Upload Combined Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: andromodem-all-packages
+          path: downloaded/**/*
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v1
+        if: ${{ inputs.publish == true }}
+        with:
+          tag_name: ${{ inputs.tag_name }}
+          files: downloaded/**/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
